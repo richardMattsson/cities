@@ -1,15 +1,15 @@
 import { startTransition, useEffect, useState } from "react";
-import { getCitiesAPI } from "../api/cities";
-import type { City } from "../../../shared/types";
+import type { Region } from "../../../shared/types";
 import { Link } from "react-router-dom";
+import { getRegionsAPI } from "../api/regions";
 
-function AllCities() {
-  const [cities, setCities] = useState<City[]>([]);
+function RegionsView() {
+  const [regions, setRegions] = useState<Region[]>([]);
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const response = await getCitiesAPI();
+        const response = await getRegionsAPI();
         if (!response.ok) {
           console.log("error fetching resources");
           return;
@@ -17,7 +17,7 @@ function AllCities() {
         const result = await response.json();
 
         if (!mounted) return;
-        startTransition(() => setCities(result));
+        startTransition(() => setRegions(result));
       } catch {
         if (mounted) return;
       }
@@ -26,16 +26,11 @@ function AllCities() {
       mounted = false;
     };
   }, []);
-  return (
-    <>
-      {" "}
-      <ItemsList items={cities} />
-    </>
-  );
+  return <ItemsList items={regions} />;
 }
 
 type ItemsListProps = {
-  items: City[];
+  items: Region[];
 };
 function ItemsList({ items }: ItemsListProps) {
   const sortedItems = [...items].toSorted((a, b) => {
@@ -51,11 +46,11 @@ function ItemsList({ items }: ItemsListProps) {
   });
   return (
     <article>
-      <h2>Städer lista</h2>
+      <h2>Regioner lista</h2>
       <ul>
-        {sortedItems.map((city) => (
-          <li key={city.id}>
-            <Link to={`/city/${city.id}`}>{city.name}</Link>
+        {sortedItems.map((region) => (
+          <li key={region.id}>
+            <Link to={`/region/${region.id}`}>{region.name}</Link>
           </li>
         ))}
       </ul>
@@ -63,4 +58,4 @@ function ItemsList({ items }: ItemsListProps) {
   );
 }
 
-export default AllCities;
+export default RegionsView;

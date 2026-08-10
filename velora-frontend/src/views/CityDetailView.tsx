@@ -1,13 +1,22 @@
 import { startTransition, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { deleteCityAPI, getOneCityAPI } from "../api/cities";
-import type { City } from "../../../shared/types";
+import type { City, Region } from "../../../shared/types";
+import { getRegionsAPI } from "../api/regions";
 
 function CityDetailView() {
   const { id } = useParams();
-  const [city, setCity] = useState<City>();
+  const [city, setCity] = useState<City>({
+    id: 0,
+    name: "",
+    population: "",
+    region: "",
+  });
+  const [regions, setRegions] = useState<Region[]>();
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
+  const region = regions?.find((region) => region.name === city.region);
+  const regionId = region?.id;
 
   useEffect(() => {
     let mounted = true;
@@ -33,6 +42,29 @@ function CityDetailView() {
     };
   }, [id]);
 
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const response = await getRegionsAPI();
+        if (!response.ok) {
+          console.log("error fetching resource");
+          return;
+        }
+        const result = await response.json();
+
+        if (!mounted) return;
+
+        startTransition(() => setRegions(result));
+      } catch {
+        if (mounted) return;
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   async function deleteCity() {
     const proceed = confirm("Vill du verkligen ta bort staden?");
 
@@ -56,6 +88,11 @@ function CityDetailView() {
     <article>
       <h1>{city && "Namn: " + city.name}</h1>
       <p>{city && "Befolkning antal: " + city.population}</p>
+      <p>
+        <Link to={`/region/${regionId ?? ""}`}>
+          {city && "Region: " + city.region}
+        </Link>
+      </p>
       <section
         style={{
           display: "flex",
@@ -65,7 +102,7 @@ function CityDetailView() {
         }}
       >
         <button>
-          <Link to={`/form/update/${id}`}>Uppdatera stad</Link>
+          <Link to={`/city-form/update/${id}`}>Uppdatera stad</Link>
         </button>
         <button onClick={deleteCity}>Ta bort stad</button>
       </section>

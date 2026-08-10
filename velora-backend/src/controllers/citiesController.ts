@@ -27,12 +27,12 @@ async function getOneCity(req: Request, res: Response, next: NextFunction) {
 }
 
 async function postCity(req: Request, res: Response, next: NextFunction) {
-  const { name, population } = req.body;
+  const { name, population, region } = req.body;
   if (typeof name !== "string") {
     res.status(400).json({ error: "Invalid name" });
   }
   try {
-    const city = await insertCity(name, Number(population));
+    const city = await insertCity(name, Number(population), region);
     res.status(201).json(city.rows[0]);
   } catch (error) {
     next(error);
@@ -41,12 +41,13 @@ async function postCity(req: Request, res: Response, next: NextFunction) {
 
 async function updateCity(req: Request, res: Response, next: NextFunction) {
   const { id } = req.params;
-  const { name, population } = req.body;
+  const { name, population, region } = req.body;
 
   try {
     const response = await updateCity_service(
       name,
       Number(population),
+      region,
       Number(id),
     );
     if (!response) {

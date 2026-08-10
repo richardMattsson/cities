@@ -1,14 +1,49 @@
 import { startTransition, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { City } from "../../../shared/types";
+import type { City, Region } from "../../../shared/types";
 import { getOneCityAPI, postCityAPI, updateCityAPI } from "../api/cities";
+import { getRegionsAPI } from "../api/regions";
 
-function FormView() {
+function CityFormView() {
   const { option, id } = useParams();
   const add = option === "add";
-  const [city, setCity] = useState<City>({ id: 0, name: "", population: "" });
+  const [city, setCity] = useState<City>({
+    id: 0,
+    name: "",
+    population: "",
+    region: "",
+  });
+  const [regions, setRegions] = useState<Region[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
+
+  useEffect(() => {
+    console.log(city);
+  }, [city]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const response = await getRegionsAPI();
+        if (!response.ok) {
+          console.log("error fetching resources");
+          return;
+        }
+        const result = await response.json();
+
+        console.log(result);
+
+        if (!mounted) return;
+        startTransition(() => setRegions(result));
+      } catch {
+        if (mounted) return;
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (add) {
@@ -33,11 +68,15 @@ function FormView() {
     return () => {
       mounted = false;
     };
-  }, [id]);
+  }, [id, add]);
 
   async function postCity(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    const body = { name: city.name, population: city.population };
+    const body = {
+      name: city.name,
+      population: city.population,
+      region: city.region,
+    };
 
     try {
       const response = await postCityAPI(body);
@@ -54,7 +93,11 @@ function FormView() {
   async function updateCity(e: React.SubmitEvent<HTMLFormElement>, id: number) {
     e.preventDefault();
 
-    const body = { name: city.name, population: city.population };
+    const body = {
+      name: city.name,
+      population: city.population,
+      region: city.region,
+    };
 
     try {
       const response = await updateCityAPI(body, id);
@@ -71,7 +114,7 @@ function FormView() {
   }
   return (
     <article>
-      <h2>{add ? "Skapa ny stad" : "Uppdatera" + id}</h2>
+      <h2>{add ? "Skapa ny stad" : "Uppdatera stad"}</h2>
       <form
         onSubmit={add ? (e) => postCity(e) : (e) => updateCity(e, Number(id))}
         style={{
@@ -93,6 +136,7 @@ function FormView() {
                 id: city.id,
                 name: e.target.value,
                 population: city.population,
+                region: city.region,
               })
             }
           />
@@ -109,9 +153,33 @@ function FormView() {
                 id: city.id,
                 name: city.name,
                 population: e.target.value,
+                region: city.region,
               })
             }
           />
+        </section>
+        <section className="inputSection">
+          <label htmlFor="populationInput">Region: </label>
+          <select
+            name=""
+            id=""
+            onChange={(e) =>
+              setCity({
+                id: city.id,
+                name: city.name,
+                population: city.population,
+                region: e.target.value,
+              })
+            }
+          >
+            <option value="">Regioner</option>
+            {regions &&
+              regions.map((region) => (
+                <option key={region.id} value={region.name}>
+                  {region.name}
+                </option>
+              ))}
+          </select>
         </section>
         <input type="submit" value={"Skicka"} />
       </form>
@@ -120,4 +188,4 @@ function FormView() {
     </article>
   );
 }
-export default FormView;
+export default CityFormView;

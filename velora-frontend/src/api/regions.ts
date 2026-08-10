@@ -1,20 +1,20 @@
-import type { City } from "../../../shared/types";
+import type { Region } from "../../../shared/types";
 
-const URL = "http://localhost:3001/cities";
+const URL = "http://localhost:3001/regions";
 
-export async function getCitiesAPI() {
+export async function getRegionsAPI() {
   const response = await fetch(URL);
   return response;
 }
 
-export async function getOneCityAPI(id: number) {
+export async function getOneRegionAPI(id: number) {
   const response = await fetch(`${URL}/${id}`);
   return response;
 }
 
-export async function postCityAPI(body: Omit<City, "id">) {
+export async function postRegionAPI(body: Omit<Region, "id">) {
   const response = await fetch(URL, {
-    method: "POST",
+    method: "post",
     headers: {
       "Content-Type": "application/json",
     },
@@ -23,7 +23,7 @@ export async function postCityAPI(body: Omit<City, "id">) {
   return response;
 }
 
-export async function updateCityAPI(body: Omit<City, "id">, id: number) {
+export async function updateRegionAPI(body: Omit<Region, "id">, id: number) {
   const response = await fetch(`${URL}/${id}`, {
     method: "PUT",
     headers: {
@@ -34,7 +34,7 @@ export async function updateCityAPI(body: Omit<City, "id">, id: number) {
   return response;
 }
 
-export async function deleteCityAPI(id: number) {
+export async function deleteRegionAPI(id: number) {
   const response = await fetch(`${URL}/${id}`, {
     method: "DELETE",
   });

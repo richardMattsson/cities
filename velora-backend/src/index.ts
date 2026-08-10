@@ -4,6 +4,7 @@ import express, {
   type Response,
 } from "express";
 import citiesRoutes from "./routes/citiesRoutes.ts";
+import regionRoutes from "./routes/regionRoutes.ts";
 import cors from "cors";
 import { HttpError } from "./errors/HttpError.ts";
 
@@ -20,6 +21,7 @@ app.get("/", (_request, response) => {
 });
 
 app.use("/cities", citiesRoutes);
+app.use("/regions", regionRoutes);
 
 app.use((_req: Request, _res: Response, next) => {
   const error = new Error("Something went wrong");
