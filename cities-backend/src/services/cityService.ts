@@ -12,14 +12,6 @@ async function selectOne(id: number) {
   return cities;
 }
 
-async function innerJoinCities(region: string) {
-  const cities = await pool.query(
-    "select cities_id, cities_name, regions_name from cities inner join regions on cities.region = regions.regions_name where regions_name = $1",
-    [region],
-  );
-  return cities;
-}
-
 async function insertCity(name: string, population: number, region: string) {
   const city = await pool.query(
     "insert into cities (cities_name, cities_population, region) values ($1, $2, $3) returning *",
@@ -52,7 +44,6 @@ async function deleteCity_service(id: number) {
 export {
   selectAll,
   selectOne,
-  innerJoinCities,
   insertCity,
   updateCity_service,
   deleteCity_service,
