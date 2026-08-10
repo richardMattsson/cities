@@ -1,0 +1,72 @@
+import type { NextFunction, Request, Response } from "express";
+import {
+  deleteCity_service,
+  insertCity,
+  selectAll,
+  selectOne,
+  updateCity_service,
+} from "../services/cityService.ts";
+import { HttpError } from "../errors/HttpError.ts";
+
+async function getCities(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const cities = await selectAll();
+    res.json(cities.rows);
+  } catch (error) {
+    next(error);
+  }
+}
+async function getOneCity(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.params;
+  try {
+    const cities = await selectOne(Number(id));
+    res.json(cities.rows);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function postCity(req: Request, res: Response, next: NextFunction) {
+  const { name, population } = req.body;
+  if (typeof name !== "string") {
+    res.status(400).json({ error: "Invalid name" });
+  }
+  try {
+    const city = await insertCity(name, Number(population));
+    res.status(201).json(city.rows[0]);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function updateCity(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.params;
+  const { name, population } = req.body;
+
+  try {
+    const response = await updateCity_service(
+      name,
+      Number(population),
+      Number(id),
+    );
+    if (!response) {
+      return next(new HttpError(404, "City not found"));
+    }
+    res.status(200).json(response.rows[0]);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function deleteCity(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.params;
+  try {
+    const result = await deleteCity_service(Number(id));
+    console.log(result);
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export { getCities, getOneCity, postCity, updateCity, deleteCity };
