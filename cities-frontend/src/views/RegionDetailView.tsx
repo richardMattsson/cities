@@ -1,11 +1,16 @@
 import { startTransition, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import type { Region } from "../../../shared/types";
-import { deleteRegionAPI, getOneRegionAPI } from "../api/regions";
+import type { City, Region } from "../../../shared/types";
+import {
+  deleteRegionAPI,
+  getCitiesFromRegion,
+  getOneRegionAPI,
+} from "../api/regions";
 
 function RegionDetailView() {
   const { id } = useParams();
   const [region, setRegion] = useState<Region>();
+  const [cities, setCities] = useState<City[]>();
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
 
@@ -32,6 +37,29 @@ function RegionDetailView() {
     };
   }, [id]);
 
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const response = await getCitiesFromRegion(Number(id));
+        if (!response.ok) {
+          console.log("error fetching resource");
+          return;
+        }
+        const result = await response.json();
+
+        if (!mounted) return;
+
+        startTransition(() => setCities(result));
+      } catch {
+        if (mounted) return;
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
+
   async function deleteRegion() {
     const proceed = confirm("Vill du verkligen ta bort regionen?");
 
@@ -44,7 +72,7 @@ function RegionDetailView() {
         console.log("error fetching resource");
         return;
       }
-      setSuccesMsg("Du har tagit bort en stad");
+      setSuccesMsg("Du har tagit bort en region.");
     } catch {
       setErrorMsg("Något gick fel.");
       return;
@@ -53,8 +81,16 @@ function RegionDetailView() {
 
   return (
     <article>
-      <h1>{region && "Namn: " + region.name}</h1>
-      <p>{region && "Befolkning antal: " + region.population}</p>
+      <h1>{region && "Namn: " + region.regions_name}</h1>
+      <p>{region && "Befolkning antal: " + region.regions_population}</p>
+      <ul>
+        {cities &&
+          cities.map((city) => (
+            <li>
+              <Link to={`/city/${city.cities_id}`}>{city.cities_name}</Link>
+            </li>
+          ))}
+      </ul>
       <section
         style={{
           display: "flex",

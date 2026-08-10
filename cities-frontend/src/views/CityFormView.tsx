@@ -8,9 +8,9 @@ function CityFormView() {
   const { option, id } = useParams();
   const add = option === "add";
   const [city, setCity] = useState<City>({
-    id: 0,
-    name: "",
-    population: "",
+    cities_id: 0,
+    cities_name: "",
+    cities_population: "",
     region: "",
   });
   const [regions, setRegions] = useState<Region[]>([]);
@@ -73,8 +73,8 @@ function CityFormView() {
   async function postCity(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     const body = {
-      name: city.name,
-      population: city.population,
+      cities_name: city.cities_name,
+      cities_population: city.cities_population,
       region: city.region,
     };
 
@@ -94,8 +94,8 @@ function CityFormView() {
     e.preventDefault();
 
     const body = {
-      name: city.name,
-      population: city.population,
+      cities_name: city.cities_name,
+      cities_population: city.cities_population,
       region: city.region,
     };
 
@@ -129,13 +129,13 @@ function CityFormView() {
             id="cityInput"
             type="text"
             placeholder="Stad"
-            value={city.name}
+            value={city.cities_name}
             required
             onChange={(e) =>
               setCity({
-                id: city.id,
-                name: e.target.value,
-                population: city.population,
+                cities_id: city.cities_id,
+                cities_name: e.target.value,
+                cities_population: city.cities_population,
                 region: city.region,
               })
             }
@@ -146,13 +146,13 @@ function CityFormView() {
           <input
             id="populationInput"
             type="number"
-            value={city.population}
+            value={city.cities_population}
             required
             onChange={(e) =>
               setCity({
-                id: city.id,
-                name: city.name,
-                population: e.target.value,
+                cities_id: city.cities_id,
+                cities_name: city.cities_name,
+                cities_population: e.target.value,
                 region: city.region,
               })
             }
@@ -165,9 +165,9 @@ function CityFormView() {
             id=""
             onChange={(e) =>
               setCity({
-                id: city.id,
-                name: city.name,
-                population: city.population,
+                cities_id: city.cities_id,
+                cities_name: city.cities_name,
+                cities_population: city.cities_population,
                 region: e.target.value,
               })
             }
@@ -175,8 +175,8 @@ function CityFormView() {
             <option value="">Regioner</option>
             {regions &&
               regions.map((region) => (
-                <option key={region.id} value={region.name}>
-                  {region.name}
+                <option key={region.regions_id} value={region.regions_name}>
+                  {region.regions_name}
                 </option>
               ))}
           </select>

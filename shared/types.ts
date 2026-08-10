@@ -1,12 +1,12 @@
 export interface City {
-  id: number;
-  name: string;
-  population: number | string;
+  cities_id: number;
+  cities_name: string;
+  cities_population: number | string;
   region: string;
 }
 
 export interface Region {
-  id: number;
-  name: string;
-  population: number | string;
+  regions_id: number;
+  regions_name: string;
+  regions_population: number | string;
 }

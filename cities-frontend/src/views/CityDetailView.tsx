@@ -7,16 +7,16 @@ import { getRegionsAPI } from "../api/regions";
 function CityDetailView() {
   const { id } = useParams();
   const [city, setCity] = useState<City>({
-    id: 0,
-    name: "",
-    population: "",
+    cities_id: 0,
+    cities_name: "",
+    cities_population: "",
     region: "",
   });
   const [regions, setRegions] = useState<Region[]>();
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
-  const region = regions?.find((region) => region.name === city.region);
-  const regionId = region?.id;
+  const region = regions?.find((region) => region.regions_name === city.region);
+  const regionId = region?.regions_id;
 
   useEffect(() => {
     let mounted = true;
@@ -86,8 +86,8 @@ function CityDetailView() {
 
   return (
     <article>
-      <h1>{city && "Namn: " + city.name}</h1>
-      <p>{city && "Befolkning antal: " + city.population}</p>
+      <h1>{city && "Namn: " + city.cities_name}</h1>
+      <p>{city && "Befolkning antal: " + city.cities_population}</p>
       <p>
         <Link to={`/region/${regionId ?? ""}`}>
           {city && "Region: " + city.region}

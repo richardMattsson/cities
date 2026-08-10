@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 
 function CitiesView() {
   const [cities, setCities] = useState<City[]>([]);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -15,6 +16,7 @@ function CitiesView() {
           return;
         }
         const result = await response.json();
+        console.log(result);
 
         if (!mounted) return;
         startTransition(() => setCities(result));
@@ -39,8 +41,8 @@ type ItemsListProps = {
 };
 function ItemsList({ items }: ItemsListProps) {
   const sortedItems = [...items].toSorted((a, b) => {
-    const nameA = a.name.toUpperCase();
-    const nameB = b.name.toUpperCase();
+    const nameA = a.cities_name.toUpperCase();
+    const nameB = b.cities_name.toUpperCase();
     if (nameA < nameB) {
       return -1;
     }
@@ -54,8 +56,8 @@ function ItemsList({ items }: ItemsListProps) {
       <h2>Städer lista</h2>
       <ul>
         {sortedItems.map((city) => (
-          <li key={city.id}>
-            <Link to={`/city/${city.id}`}>{city.name}</Link>
+          <li key={city.cities_id}>
+            <Link to={`/city/${city.cities_id}`}>{city.cities_name}</Link>
           </li>
         ))}
       </ul>

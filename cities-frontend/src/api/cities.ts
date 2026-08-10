@@ -12,7 +12,7 @@ export async function getOneCityAPI(id: number) {
   return response;
 }
 
-export async function postCityAPI(body: Omit<City, "id">) {
+export async function postCityAPI(body: Omit<City, "cities_id">) {
   const response = await fetch(URL, {
     method: "POST",
     headers: {
@@ -23,7 +23,7 @@ export async function postCityAPI(body: Omit<City, "id">) {
   return response;
 }
 
-export async function updateCityAPI(body: Omit<City, "id">, id: number) {
+export async function updateCityAPI(body: Omit<City, "cities_id">, id: number) {
   const response = await fetch(`${URL}/${id}`, {
     method: "PUT",
     headers: {

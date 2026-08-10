@@ -12,7 +12,12 @@ export async function getOneRegionAPI(id: number) {
   return response;
 }
 
-export async function postRegionAPI(body: Omit<Region, "id">) {
+export async function getCitiesFromRegion(id: number) {
+  const response = await fetch(`${URL}/cities/${id}`);
+  return response;
+}
+
+export async function postRegionAPI(body: Omit<Region, "regions_id">) {
   const response = await fetch(URL, {
     method: "post",
     headers: {
@@ -23,7 +28,10 @@ export async function postRegionAPI(body: Omit<Region, "id">) {
   return response;
 }
 
-export async function updateRegionAPI(body: Omit<Region, "id">, id: number) {
+export async function updateRegionAPI(
+  body: Omit<Region, "regions_id">,
+  id: number,
+) {
   const response = await fetch(`${URL}/${id}`, {
     method: "PUT",
     headers: {

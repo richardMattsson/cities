@@ -11,9 +11,9 @@ function RegionFormView() {
   const { option, id } = useParams();
   const add = option === "add";
   const [region, setRegion] = useState<Region>({
-    id: 0,
-    name: "",
-    population: "",
+    regions_id: 0,
+    regions_name: "",
+    regions_population: "",
   });
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
@@ -46,8 +46,8 @@ function RegionFormView() {
   async function postRegion(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     const body = {
-      name: region.name,
-      population: region.population,
+      regions_name: region.regions_name,
+      regions_population: region.regions_population,
     };
 
     try {
@@ -69,8 +69,8 @@ function RegionFormView() {
     e.preventDefault();
 
     const body = {
-      name: region.name,
-      population: region.population,
+      regions_name: region.regions_name,
+      regions_population: region.regions_population,
     };
 
     try {
@@ -100,18 +100,18 @@ function RegionFormView() {
         }}
       >
         <section className="inputSection">
-          <label htmlFor="cityInput">Stad: </label>
+          <label htmlFor="regionInput">Region: </label>
           <input
-            id="cityInput"
+            id="regionInput"
             type="text"
             placeholder="Region"
-            value={region.name}
+            value={region.regions_name}
             required
             onChange={(e) =>
               setRegion({
-                id: region.id,
-                name: e.target.value,
-                population: region.population,
+                regions_id: region.regions_id,
+                regions_name: e.target.value,
+                regions_population: region.regions_population,
               })
             }
           />
@@ -121,13 +121,13 @@ function RegionFormView() {
           <input
             id="populationInput"
             type="number"
-            value={region.population}
+            value={region.regions_population}
             required
             onChange={(e) =>
               setRegion({
-                id: region.id,
-                name: region.name,
-                population: e.target.value,
+                regions_id: region.regions_id,
+                regions_name: region.regions_name,
+                regions_population: e.target.value,
               })
             }
           />

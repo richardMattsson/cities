@@ -34,8 +34,8 @@ type ItemsListProps = {
 };
 function ItemsList({ items }: ItemsListProps) {
   const sortedItems = [...items].toSorted((a, b) => {
-    const nameA = a.name.toUpperCase();
-    const nameB = b.name.toUpperCase();
+    const nameA = a.regions_name.toUpperCase();
+    const nameB = b.regions_name.toUpperCase();
     if (nameA < nameB) {
       return -1;
     }
@@ -49,8 +49,10 @@ function ItemsList({ items }: ItemsListProps) {
       <h2>Regioner lista</h2>
       <ul>
         {sortedItems.map((region) => (
-          <li key={region.id}>
-            <Link to={`/region/${region.id}`}>{region.name}</Link>
+          <li key={region.regions_id}>
+            <Link to={`/region/${region.regions_id}`}>
+              {region.regions_name}
+            </Link>
           </li>
         ))}
       </ul>
