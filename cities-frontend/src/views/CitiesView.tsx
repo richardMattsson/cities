@@ -16,7 +16,6 @@ function CitiesView() {
           return;
         }
         const result = await response.json();
-        console.log(result);
 
         if (!mounted) return;
         startTransition(() => setCities(result));
@@ -30,7 +29,6 @@ function CitiesView() {
   }, []);
   return (
     <>
-      {" "}
       <ItemsList items={cities} />
     </>
   );
@@ -40,22 +38,17 @@ type ItemsListProps = {
   items: City[];
 };
 function ItemsList({ items }: ItemsListProps) {
-  const sortedItems = [...items].toSorted((a, b) => {
-    const nameA = a.cities_name.toUpperCase();
-    const nameB = b.cities_name.toUpperCase();
-    if (nameA < nameB) {
-      return -1;
-    }
-    if (nameA > nameB) {
-      return 1;
-    }
-    return 0;
-  });
   return (
-    <article>
+    <article
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
       <h2>Städer lista</h2>
       <ul>
-        {sortedItems.map((city) => (
+        {items.map((city) => (
           <li key={city.cities_id}>
             <Link to={`/city/${city.cities_id}`}>{city.cities_name}</Link>
           </li>

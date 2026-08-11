@@ -1,31 +1,42 @@
-import { pool } from "../config/database.ts";
+import { eq } from "drizzle-orm";
+import { db } from "../db/index.ts";
+import { cities, regions } from "../db/schema.ts";
 
 async function selectAll() {
-  const regions = await pool.query("select * from regions");
-  return regions;
+  const response = await db
+    .select()
+    .from(regions)
+    .orderBy(regions.regions_name);
+  return response;
 }
 
 async function selectOne(id: number) {
-  const region = await pool.query(
-    "select * from regions where regions_id = $1",
-    [id],
-  );
-  return region;
+  const response = await db
+    .select()
+    .from(regions)
+    .where(eq(regions.regions_id, id));
+  return response;
 }
 
 async function innerJoinCities(id: number) {
-  const cities = await pool.query(
-    "select cities_id, cities_name, regions_name from cities inner join regions on cities.region = regions.regions_name where regions_id = $1",
-    [id],
-  );
-  return cities;
+  const response = await db
+    .select({
+      cities_id: cities.cities_id,
+      cities_name: cities.cities_name,
+      regions_name: regions.regions_name,
+    })
+    .from(cities)
+    .innerJoin(regions, eq(cities.region, regions.regions_name))
+    .where(eq(regions.regions_id, id))
+    .orderBy(cities.cities_name);
+  return response;
 }
 
 async function insertRegion(name: string, population: number) {
-  const city = await pool.query(
-    "insert into regions (regions_name, regions_population) values ($1, $2) returning *",
-    [name, population],
-  );
+  const city = await db
+    .insert(regions)
+    .values({ regions_name: name, regions_population: population })
+    .returning();
   return city;
 }
 
@@ -34,19 +45,21 @@ async function updateRegion_service(
   population: number,
   id: number,
 ) {
-  const result = await pool.query(
-    "update regions set regions_name = $1, regions_population = $2 where regions_id = $3 returning *",
-    [name, population, id],
-  );
+  const result = await db
+    .update(regions)
+    .set({ regions_name: name, regions_population: population })
+    .where(eq(regions.regions_id, id))
+    .returning();
 
   return result;
 }
 
 async function deleteRegion_service(id: number) {
-  const result = await pool.query(
-    "delete from regions where regions_id = $1 returning *",
-    [id],
-  );
+  const result = await db
+    .delete(regions)
+    .where(eq(regions.regions_id, id))
+    .returning();
+
   return result;
 }
 export {

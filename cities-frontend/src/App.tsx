@@ -26,18 +26,20 @@ function App() {
         { element: <RegionDetailView />, path: "/region/:id" },
       ],
       element: (
-        <>
-          <nav>
+        <div id="mainContainer">
+          <nav id="navigation">
             <ul>
               <li>
                 <Link to="/">Hem</Link>
               </li>
+              <hr />
               <li>
                 <Link to="/cities">Visa Städer</Link>
               </li>
               <li>
                 <Link to="/regions">Visa Regioner</Link>
               </li>
+              <hr />
               <li>
                 <Link to="/city-form/add">Skapa ny stad</Link>
               </li>
@@ -46,10 +48,10 @@ function App() {
               </li>
             </ul>
           </nav>
-          <main>
+          <main id="mainContent">
             <Outlet />
           </main>
-        </>
+        </div>
       ),
     },
   ]);

@@ -1,23 +1,30 @@
-import { pool } from "../config/database.ts";
+import { eq } from "drizzle-orm";
+import { db } from "../db/index.ts";
+import { cities } from "../db/schema.ts";
 
 async function selectAll() {
-  const cities = await pool.query("select * from cities");
-  return cities;
+  const response = await db.select().from(cities).orderBy(cities.cities_name);
+  return response;
 }
 
 async function selectOne(id: number) {
-  const cities = await pool.query("select * from cities where cities_id = $1", [
-    id,
-  ]);
-  return cities;
+  const response = await db
+    .select()
+    .from(cities)
+    .where(eq(cities.cities_id, id));
+  return response;
 }
 
 async function insertCity(name: string, population: number, region: string) {
-  const city = await pool.query(
-    "insert into cities (cities_name, cities_population, region) values ($1, $2, $3) returning *",
-    [name, population, region],
-  );
-  return city;
+  const response = await db
+    .insert(cities)
+    .values({
+      cities_name: name,
+      cities_population: population,
+      region,
+    })
+    .returning();
+  return response;
 }
 
 async function updateCity_service(
@@ -26,19 +33,20 @@ async function updateCity_service(
   region: string,
   id: number,
 ) {
-  const result = await pool.query(
-    "update cities set cities_name = $1, cities_population = $2, region = $3 where cities_id = $4 returning *",
-    [name, population, region, id],
-  );
+  const response = await db
+    .update(cities)
+    .set({ cities_name: name, cities_population: population, region })
+    .where(eq(cities.cities_id, id))
+    .returning();
 
-  return result;
+  return response;
 }
 
 async function deleteCity_service(id: number) {
-  const result = await pool.query(
-    "delete from cities where cities_id = $1 returning *",
-    [id],
-  );
+  const result = await db
+    .delete(cities)
+    .where(eq(cities.cities_id, id))
+    .returning();
   return result;
 }
 export {

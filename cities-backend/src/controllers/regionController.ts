@@ -12,7 +12,7 @@ import { HttpError } from "../errors/HttpError.ts";
 async function getRegions(_req: Request, res: Response, next: NextFunction) {
   try {
     const regions = await selectAll();
-    res.json(regions.rows);
+    res.json(regions);
   } catch (error) {
     next(error);
   }
@@ -25,7 +25,7 @@ async function getOneRegionAPI(
   const { id } = req.params;
   try {
     const region = await selectOne(Number(id));
-    res.json(region.rows);
+    res.json(region);
   } catch (error) {
     next(error);
   }
@@ -39,7 +39,7 @@ async function getCitiesFromRegion(
   const { id } = req.params;
   try {
     const cities = await innerJoinCities(Number(id));
-    res.json(cities.rows);
+    res.json(cities);
   } catch (error) {
     next(error);
   }
@@ -61,7 +61,7 @@ async function postRegion(req: Request, res: Response, next: NextFunction) {
       regions_name.trim(),
       Number(regions_population),
     );
-    res.status(201).json(region.rows[0]);
+    res.status(201).json(region);
   } catch (error) {
     next(error);
   }
@@ -80,7 +80,7 @@ async function updateRegion(req: Request, res: Response, next: NextFunction) {
     if (!response) {
       return next(new HttpError(404, "Region not found"));
     }
-    res.status(200).json(response.rows[0]);
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -90,8 +90,23 @@ async function deleteRegion(req: Request, res: Response, next: NextFunction) {
   const { id } = req.params;
   try {
     const result = await deleteRegion_service(Number(id));
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(result);
   } catch (error) {
+    console.error(error);
+
+    if (
+      error instanceof Error &&
+      (error.name === "DrizzleQueryError" ||
+        (error as any).code === "23503" ||
+        /foreign key/i.test(error.message))
+    ) {
+      return next(
+        new HttpError(
+          409,
+          "Kan inte ta bort regionen: det finns en eller flera städer som refererar till den.",
+        ),
+      );
+    }
     next(error);
   }
 }

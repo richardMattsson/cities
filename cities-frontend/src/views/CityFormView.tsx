@@ -18,10 +18,6 @@ function CityFormView() {
   const [succesMsg, setSuccesMsg] = useState("");
 
   useEffect(() => {
-    console.log(city);
-  }, [city]);
-
-  useEffect(() => {
     let mounted = true;
     (async () => {
       try {
@@ -83,6 +79,10 @@ function CityFormView() {
       if (!response.ok) {
         console.log("error fetching resource");
       }
+      const result = await response.json();
+
+      console.log(result);
+
       setSuccesMsg("Du har skapat en ny stad!");
     } catch {
       setErrorMsg("Något gick fel.");
@@ -113,18 +113,28 @@ function CityFormView() {
     }
   }
   return (
-    <article>
+    <article
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "10px",
+      }}
+    >
       <h2>{add ? "Skapa ny stad" : "Uppdatera stad"}</h2>
       <form
         onSubmit={add ? (e) => postCity(e) : (e) => updateCity(e, Number(id))}
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
+          width: "80%",
+          gap: "5px",
         }}
       >
         <section className="inputSection">
-          <label htmlFor="cityInput">Stad: </label>
+          <label htmlFor="cityInput" className="labelForm">
+            Stad:{" "}
+          </label>
           <input
             id="cityInput"
             type="text"
@@ -139,10 +149,13 @@ function CityFormView() {
                 region: city.region,
               })
             }
+            className="inputField"
           />
         </section>
         <section className="inputSection">
-          <label htmlFor="populationInput">Antal invånare: </label>
+          <label htmlFor="populationInput" className="labelForm">
+            Antal invånare:{" "}
+          </label>
           <input
             id="populationInput"
             type="number"
@@ -156,10 +169,13 @@ function CityFormView() {
                 region: city.region,
               })
             }
+            className="inputField"
           />
         </section>
         <section className="inputSection">
-          <label htmlFor="populationInput">Region: </label>
+          <label htmlFor="populationInput" className="labelForm">
+            Region:{" "}
+          </label>
           <select
             name=""
             id=""
@@ -171,8 +187,11 @@ function CityFormView() {
                 region: e.target.value,
               })
             }
+            className="inputField"
           >
-            <option value="">Regioner</option>
+            <option value="" disabled>
+              Välj
+            </option>
             {regions &&
               regions.map((region) => (
                 <option key={region.regions_id} value={region.regions_name}>
@@ -181,7 +200,16 @@ function CityFormView() {
               ))}
           </select>
         </section>
-        <input type="submit" value={"Skicka"} />
+        <input
+          type="submit"
+          value={"Skicka"}
+          style={{
+            width: "fit-content",
+            alignSelf: "end",
+            margin: "10px",
+            padding: "5px",
+          }}
+        />
       </form>
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}

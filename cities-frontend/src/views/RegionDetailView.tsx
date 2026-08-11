@@ -49,6 +49,7 @@ function RegionDetailView() {
         const result = await response.json();
 
         if (!mounted) return;
+        console.log(result);
 
         startTransition(() => setCities(result));
       } catch {
@@ -68,25 +69,34 @@ function RegionDetailView() {
     }
     try {
       const response = await deleteRegionAPI(Number(id));
+      const result = await response.json();
+
       if (!response.ok) {
-        console.log("error fetching resource");
+        setErrorMsg(result?.error || "Något gick fel.");
         return;
       }
+
       setSuccesMsg("Du har tagit bort en region.");
-    } catch {
+    } catch (error) {
       setErrorMsg("Något gick fel.");
-      return;
+      console.error(error);
     }
   }
 
   return (
-    <article>
+    <article
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
       <h1>{region && "Namn: " + region.regions_name}</h1>
       <p>{region && "Befolkning antal: " + region.regions_population}</p>
       <ul>
         {cities &&
           cities.map((city) => (
-            <li>
+            <li key={city.cities_id}>
               <Link to={`/city/${city.cities_id}`}>{city.cities_name}</Link>
             </li>
           ))}

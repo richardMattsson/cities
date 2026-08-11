@@ -85,7 +85,14 @@ function CityDetailView() {
   }
 
   return (
-    <article>
+    <article
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "10px",
+      }}
+    >
       <h1>{city && "Namn: " + city.cities_name}</h1>
       <p>{city && "Befolkning antal: " + city.cities_population}</p>
       <p>
@@ -99,6 +106,7 @@ function CityDetailView() {
           flexDirection: "column",
           gap: "10px",
           width: "fit-content",
+          marginTop: "30px",
         }}
       >
         <button>

@@ -87,7 +87,14 @@ function RegionFormView() {
     }
   }
   return (
-    <article>
+    <article
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "10px",
+      }}
+    >
       <h2>{add ? "Skapa ny region" : "Uppdatera region"}</h2>
       <form
         onSubmit={
@@ -96,11 +103,14 @@ function RegionFormView() {
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
+          width: "80%",
+          gap: "5px",
         }}
       >
         <section className="inputSection">
-          <label htmlFor="regionInput">Region: </label>
+          <label htmlFor="regionInput" className="labelForm">
+            Region:{" "}
+          </label>
           <input
             id="regionInput"
             type="text"
@@ -114,10 +124,13 @@ function RegionFormView() {
                 regions_population: region.regions_population,
               })
             }
+            className="inputField"
           />
         </section>
         <section className="inputSection">
-          <label htmlFor="populationInput">Antal invånare: </label>
+          <label htmlFor="populationInput" className="labelForm">
+            Antal invånare:{" "}
+          </label>
           <input
             id="populationInput"
             type="number"
@@ -130,9 +143,19 @@ function RegionFormView() {
                 regions_population: e.target.value,
               })
             }
+            className="inputField"
           />
         </section>
-        <input type="submit" value={"Skicka"} />
+        <input
+          type="submit"
+          value={"Skicka"}
+          style={{
+            width: "fit-content",
+            alignSelf: "end",
+            margin: "10px",
+            padding: "5px",
+          }}
+        />
       </form>
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
