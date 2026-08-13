@@ -18,6 +18,11 @@ async function selectOne(id: number) {
   return response;
 }
 
+async function sumOfRegions() {
+  const response = await db.$count(regions);
+  return response;
+}
+
 async function innerJoinCities(id: number) {
   const response = await db
     .select({
@@ -33,11 +38,11 @@ async function innerJoinCities(id: number) {
 }
 
 async function insertRegion(name: string, population: number) {
-  const city = await db
+  const response = await db
     .insert(regions)
     .values({ regions_name: name, regions_population: population })
     .returning();
-  return city;
+  return response;
 }
 
 async function updateRegion_service(
@@ -45,26 +50,27 @@ async function updateRegion_service(
   population: number,
   id: number,
 ) {
-  const result = await db
+  const response = await db
     .update(regions)
     .set({ regions_name: name, regions_population: population })
     .where(eq(regions.regions_id, id))
     .returning();
 
-  return result;
+  return response;
 }
 
 async function deleteRegion_service(id: number) {
-  const result = await db
+  const response = await db
     .delete(regions)
     .where(eq(regions.regions_id, id))
     .returning();
 
-  return result;
+  return response;
 }
 export {
   selectAll,
   selectOne,
+  sumOfRegions,
   innerJoinCities,
   insertRegion,
   updateRegion_service,

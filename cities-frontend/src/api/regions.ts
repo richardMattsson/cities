@@ -12,6 +12,11 @@ export async function getOneRegionAPI(id: number) {
   return response;
 }
 
+export async function sumOfRegions() {
+  const response = await fetch(`${URL}/sum`);
+  return response;
+}
+
 export async function getCitiesFromRegion(id: number) {
   const response = await fetch(`${URL}/cities/${id}`);
   return response;

@@ -5,6 +5,7 @@ import {
   insertRegion,
   selectAll,
   selectOne,
+  sumOfRegions,
   updateRegion_service,
 } from "../services/regionService.ts";
 import { HttpError } from "../errors/HttpError.ts";
@@ -26,6 +27,19 @@ async function getOneRegionAPI(
   try {
     const region = await selectOne(Number(id));
     res.json(region);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function sumOfRegions_controller(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const response = await sumOfRegions();
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -114,6 +128,7 @@ async function deleteRegion(req: Request, res: Response, next: NextFunction) {
 export {
   getRegions,
   getOneRegionAPI,
+  sumOfRegions_controller,
   getCitiesFromRegion,
   postRegion,
   updateRegion,

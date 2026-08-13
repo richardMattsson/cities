@@ -4,6 +4,7 @@ import {
   insertCity,
   selectAll,
   selectOne,
+  sumOfCities,
   updateCity_service,
 } from "../services/cityService.ts";
 import { HttpError } from "../errors/HttpError.ts";
@@ -22,6 +23,19 @@ async function getOneCity(req: Request, res: Response, next: NextFunction) {
   try {
     const cities = await selectOne(Number(id));
     res.json(cities);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function sumOfCities_controller(
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const response = await sumOfCities();
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
@@ -74,4 +88,11 @@ async function deleteCity(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { getCities, getOneCity, postCity, updateCity, deleteCity };
+export {
+  getCities,
+  getOneCity,
+  sumOfCities_controller,
+  postCity,
+  updateCity,
+  deleteCity,
+};

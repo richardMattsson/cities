@@ -23,12 +23,7 @@ app.get("/", (_request, response) => {
 app.use("/cities", citiesRoutes);
 app.use("/regions", regionRoutes);
 
-app.use((_req: Request, _res: Response, next) => {
-  const error = new Error("Something went wrong");
-  next(error);
-});
-
-app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error("Error:", err.message);
   const status = err instanceof HttpError ? err.status : 500;
   const message = err instanceof Error ? err.message : String(err);

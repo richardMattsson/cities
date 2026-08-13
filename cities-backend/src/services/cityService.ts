@@ -15,6 +15,11 @@ async function selectOne(id: number) {
   return response;
 }
 
+async function sumOfCities() {
+  const response = await db.$count(cities);
+  return response;
+}
+
 async function insertCity(name: string, population: number, region: string) {
   const response = await db
     .insert(cities)
@@ -52,6 +57,7 @@ async function deleteCity_service(id: number) {
 export {
   selectAll,
   selectOne,
+  sumOfCities,
   insertCity,
   updateCity_service,
   deleteCity_service,
