@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@firebase-oss/ui-react": "^7.0.3",
+    "@firebase-oss/ui-styles": "^7.1.0",
+    "firebase": "^12.17.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2"

@@ -8,18 +8,16 @@ import {
 import CityDetailView from "./views/CityDetailView";
 import CityFormView from "./views/CityFormView";
 import HomeView from "./views/HomeView";
-import CitiesView from "./views/CitiesView";
-import RegionsView from "./views/RegionsView";
 import RegionDetailView from "./views/RegionDetailView";
 import RegionFormView from "./views/RegionFormView";
+import ListView from "./views/ListView";
 
 function App() {
   const router = createHashRouter([
     {
       children: [
         { element: <HomeView />, path: "/" },
-        { element: <CitiesView />, path: "/cities" },
-        { element: <RegionsView />, path: "/regions" },
+        { element: <ListView />, path: "/:options" },
         { element: <CityFormView />, path: "/city-form/:option/:id?" },
         { element: <RegionFormView />, path: "/region-form/:option/:id?" },
         { element: <CityDetailView />, path: "/city/:id" },

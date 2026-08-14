@@ -26,6 +26,7 @@
     "drizzle-orm": "^1.0.0-rc.4",
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
+    "firebase-admin": "^14.2.0",
     "pg": "^8.23.0",
     "pg-promise": "^12.7.0"
   }
