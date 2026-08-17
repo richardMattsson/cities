@@ -7,6 +7,20 @@ import citiesRoutes from "./routes/citiesRoutes.ts";
 import regionRoutes from "./routes/regionRoutes.ts";
 import cors from "cors";
 import { HttpError } from "./errors/HttpError.ts";
+import dotenv from "dotenv";
+
+dotenv.config();
+import { readFileSync } from "fs";
+
+import { initializeApp, cert } from "firebase-admin/app";
+
+const serviceAccount = JSON.parse(
+  readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS!, "utf8"),
+);
+
+initializeApp({
+  credential: cert(serviceAccount),
+});
 
 const app = express();
 

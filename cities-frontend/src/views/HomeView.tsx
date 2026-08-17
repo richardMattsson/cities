@@ -1,6 +1,6 @@
 import { startTransition, useEffect, useState } from "react";
-import { sumOfCities } from "../api/cities";
-import { sumOfRegions } from "../api/regions";
+import { sumOfCities } from "../api/citiesAPI";
+import { sumOfRegions } from "../api/regionsAPI";
 import { Link } from "react-router-dom";
 
 function HomeView() {

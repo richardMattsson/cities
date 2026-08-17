@@ -46,6 +46,11 @@ async function postCity(req: Request, res: Response, next: NextFunction) {
   if (typeof cities_name !== "string") {
     res.status(400).json({ error: "Invalid name" });
   }
+  if (!region) {
+    res
+      .status(400)
+      .json({ error: "Du behöver ange vilken region staden tillhör." });
+  }
   try {
     const city = await insertCity(
       cities_name,
@@ -61,6 +66,15 @@ async function postCity(req: Request, res: Response, next: NextFunction) {
 async function updateCity(req: Request, res: Response, next: NextFunction) {
   const { id } = req.params;
   const { cities_name, cities_population, region } = req.body;
+
+  if (typeof cities_name !== "string") {
+    res.status(400).json({ error: "Invalid name" });
+  }
+  if (!region) {
+    res
+      .status(400)
+      .json({ error: "Du behöver ange vilken region staden tillhör." });
+  }
 
   try {
     const response = await updateCity_service(

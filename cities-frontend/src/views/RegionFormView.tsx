@@ -5,7 +5,8 @@ import {
   getOneRegionAPI,
   postRegionAPI,
   updateRegionAPI,
-} from "../api/regions";
+} from "../api/regionsAPI";
+import { getAuth } from "firebase/auth";
 
 function RegionFormView() {
   const { option, id } = useParams();
@@ -51,7 +52,13 @@ function RegionFormView() {
     };
 
     try {
-      const response = await postRegionAPI(body);
+      const token = await getAuth().currentUser?.getIdToken();
+
+      if (!token) {
+        setErrorMsg("Du måste vara inloggad för att skapa en region.");
+        return;
+      }
+      const response = await postRegionAPI(body, token);
       if (!response.ok) {
         console.log("error fetching resource");
       }
@@ -74,7 +81,13 @@ function RegionFormView() {
     };
 
     try {
-      const response = await updateRegionAPI(body, id);
+      const token = await getAuth().currentUser?.getIdToken();
+
+      if (!token) {
+        setErrorMsg("Du måste vara inloggad för att skapa en region.");
+        return;
+      }
+      const response = await updateRegionAPI(body, id, token);
 
       if (!response.ok) {
         console.log("error fetching resource");

@@ -1,55 +1,60 @@
-import type { Region } from "../../../shared/types";
+import type { City } from "../../../shared/types";
 
-const URL = "http://localhost:3001/regions";
+const URL = "http://localhost:3001/cities";
 
-export async function getRegionsAPI() {
+export async function getCitiesAPI() {
   const response = await fetch(URL);
   return response;
 }
 
-export async function getOneRegionAPI(id: number) {
+export async function getOneCityAPI(id: number) {
   const response = await fetch(`${URL}/${id}`);
   return response;
 }
 
-export async function sumOfRegions() {
+export async function sumOfCities() {
   const response = await fetch(`${URL}/sum`);
   return response;
 }
 
-export async function getCitiesFromRegion(id: number) {
-  const response = await fetch(`${URL}/cities/${id}`);
-  return response;
-}
-
-export async function postRegionAPI(body: Omit<Region, "regions_id">) {
+export async function postCityAPI(
+  body: Omit<City, "cities_id">,
+  token: string,
+) {
   const response = await fetch(URL, {
-    method: "post",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
   });
+
   return response;
 }
 
-export async function updateRegionAPI(
-  body: Omit<Region, "regions_id">,
+export async function updateCityAPI(
+  body: Omit<City, "cities_id">,
   id: number,
+  token: string,
 ) {
   const response = await fetch(`${URL}/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
   });
   return response;
 }
 
-export async function deleteRegionAPI(id: number) {
+export async function deleteCityAPI(id: number, token: string) {
   const response = await fetch(`${URL}/${id}`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
   return response;
 }

@@ -5,7 +5,8 @@ import {
   deleteRegionAPI,
   getCitiesFromRegion,
   getOneRegionAPI,
-} from "../api/regions";
+} from "../api/regionsAPI";
+import { getAuth } from "firebase/auth";
 
 function RegionDetailView() {
   const { id } = useParams();
@@ -68,7 +69,13 @@ function RegionDetailView() {
       return;
     }
     try {
-      const response = await deleteRegionAPI(Number(id));
+      const token = await getAuth().currentUser?.getIdToken();
+
+      if (!token) {
+        setErrorMsg("Du måste vara inloggad för att ta bort en stad.");
+        return;
+      }
+      const response = await deleteRegionAPI(Number(id), token);
       const result = await response.json();
 
       if (!response.ok) {

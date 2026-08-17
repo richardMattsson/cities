@@ -2,8 +2,8 @@ import { useParams } from "react-router-dom";
 import type { City, Region } from "../../../shared/types";
 import ListComponent from "../components/ListComponent";
 import { startTransition, useEffect, useState } from "react";
-import { getCitiesAPI } from "../api/cities";
-import { getRegionsAPI } from "../api/regions";
+import { getCitiesAPI } from "../api/citiesAPI";
+import { getRegionsAPI } from "../api/regionsAPI";
 
 export default function ListView() {
   const { options } = useParams();

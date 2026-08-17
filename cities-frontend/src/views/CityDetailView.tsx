@@ -1,8 +1,9 @@
 import { startTransition, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { deleteCityAPI, getOneCityAPI } from "../api/cities";
+import { deleteCityAPI, getOneCityAPI } from "../api/citiesAPI";
 import type { City, Region } from "../../../shared/types";
-import { getRegionsAPI } from "../api/regions";
+import { getRegionsAPI } from "../api/regionsAPI";
+import { getAuth } from "firebase/auth";
 
 function CityDetailView() {
   const { id } = useParams();
@@ -71,8 +72,16 @@ function CityDetailView() {
     if (!proceed) {
       return;
     }
+
     try {
-      const response = await deleteCityAPI(Number(id));
+      const token = await getAuth().currentUser?.getIdToken();
+
+      if (!token) {
+        setErrorMsg("Du måste vara inloggad för att ta bort en stad.");
+        return;
+      }
+
+      const response = await deleteCityAPI(Number(id), token);
       if (!response.ok) {
         console.log("error fetching resource");
         return;
