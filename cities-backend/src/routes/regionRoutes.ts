@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/", controller.getRegions);
 router.get("/sum", controller.sumOfRegions);
-router.get("/cities/:id", controller.getCitiesFromRegion);
+router.get("/municipalities/:id", controller.getMunicipalitiesFromRegion);
 router.get("/:id", controller.getOneRegionAPI);
 router.post("/", authenticateToken, controller.postRegion);
 router.put("/:id", authenticateToken, controller.updateRegion);

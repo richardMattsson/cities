@@ -4,6 +4,7 @@ import express, {
   type Response,
 } from "express";
 import citiesRoutes from "./routes/citiesRoutes.ts";
+import municipalityRoutes from "./routes/municipalityRoutes.ts";
 import regionRoutes from "./routes/regionRoutes.ts";
 import cors from "cors";
 import { HttpError } from "./errors/HttpError.ts";
@@ -44,14 +45,15 @@ const port = 3001;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: "http://localhost:5174" }));
 
 app.get("/", (_request, response) => {
   response.json({ info: "Node.js, Express, and Postgres API" });
 });
 
-app.use("/cities", citiesRoutes);
 app.use("/regions", regionRoutes);
+app.use("/municipalities", municipalityRoutes);
+app.use("/cities", citiesRoutes);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error("Error:", err.message);

@@ -1,14 +1,23 @@
 import { useParams } from "react-router-dom";
-import type { City, Region } from "../../../shared/types";
+import type { City, Municipality, Region } from "../../../shared/types";
 import ListComponent from "../components/ListComponent";
 import { startTransition, useEffect, useState } from "react";
 import { getCitiesAPI } from "../api/citiesAPI";
 import { getRegionsAPI } from "../api/regionsAPI";
+import { getMunicipalitiesAPI } from "../api/municipalitiesAPI";
 
 export default function ListView() {
   const { options } = useParams();
 
-  return options === "cities" ? <CitiesView /> : <RegionsView />;
+  switch (options) {
+    case "cities":
+      return <CitiesView />;
+    case "municipalities":
+      return <MunicipalitiesView />;
+    case "regions":
+      return <RegionsView />;
+    default:
+  }
 }
 
 function CitiesView() {
@@ -36,6 +45,33 @@ function CitiesView() {
     };
   }, []);
   return <ListComponent cities={cities} />;
+}
+
+function MunicipalitiesView() {
+  const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const response = await getMunicipalitiesAPI();
+        if (!response.ok) {
+          console.log("error fetching resources");
+          return;
+        }
+        const result = await response.json();
+
+        if (!mounted) return;
+        startTransition(() => setMunicipalities(result));
+      } catch {
+        if (mounted) return;
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+  return <ListComponent municipalities={municipalities} />;
 }
 
 function RegionsView() {

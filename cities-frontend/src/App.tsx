@@ -15,6 +15,8 @@ import SignInView from "./views/SignInView";
 import SignUpView from "./views/SignUpView";
 import { getAuth, onAuthStateChanged, signOut, type User } from "firebase/auth";
 import { useEffect, useState } from "react";
+import MunicipalityDetailView from "./views/MunicipalityDetailsView";
+import MunicipalityFormView from "./views/MunicipalityFormView";
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -38,8 +40,13 @@ function App() {
           element: <CityFormView />,
           path: "/city-form/:option/:id?",
         },
+        {
+          element: <MunicipalityFormView />,
+          path: "/municipality-form/:option/:id?",
+        },
         { element: <RegionFormView />, path: "/region-form/:option/:id?" },
         { element: <CityDetailView />, path: "/city/:id" },
+        { element: <MunicipalityDetailView />, path: "/municipality/:id" },
         { element: <RegionDetailView />, path: "/region/:id" },
         { element: <SignUpView />, path: "/signUp" },
         { element: <SignInView />, path: "/signIn" },
@@ -78,14 +85,20 @@ function App() {
               )}
               <hr />
               <li>
-                <Link to="/cities">Visa Städer</Link>
+                <Link to="/regions">Visa Regioner</Link>
               </li>
               <li>
-                <Link to="/regions">Visa Regioner</Link>
+                <Link to="/municipalities">Visa Kommuner</Link>
+              </li>
+              <li>
+                <Link to="/cities">Visa Städer</Link>
               </li>
               <hr />
               <li>
                 <Link to="/city-form/add">Skapa ny stad</Link>
+              </li>
+              <li>
+                <Link to="/municipality-form/add">Skapa ny kommun</Link>
               </li>
               <li>
                 <Link to="/region-form/add">Skapa ny region</Link>

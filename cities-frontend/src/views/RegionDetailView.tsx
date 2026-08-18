@@ -1,9 +1,9 @@
 import { startTransition, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import type { City, Region } from "../../../shared/types";
+import type { Municipality, Region } from "../../../shared/types";
 import {
   deleteRegionAPI,
-  getCitiesFromRegion,
+  getMunicipalitiesFromRegion,
   getOneRegionAPI,
 } from "../api/regionsAPI";
 import { getAuth } from "firebase/auth";
@@ -11,7 +11,7 @@ import { getAuth } from "firebase/auth";
 function RegionDetailView() {
   const { id } = useParams();
   const [region, setRegion] = useState<Region>();
-  const [cities, setCities] = useState<City[]>();
+  const [municipalities, setMunicipalities] = useState<Municipality[]>();
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
 
@@ -42,7 +42,7 @@ function RegionDetailView() {
     let mounted = true;
     (async () => {
       try {
-        const response = await getCitiesFromRegion(Number(id));
+        const response = await getMunicipalitiesFromRegion(Number(id));
         if (!response.ok) {
           console.log("error fetching resource");
           return;
@@ -52,7 +52,7 @@ function RegionDetailView() {
         if (!mounted) return;
         console.log(result);
 
-        startTransition(() => setCities(result));
+        startTransition(() => setMunicipalities(result));
       } catch {
         if (mounted) return;
       }
@@ -72,7 +72,7 @@ function RegionDetailView() {
       const token = await getAuth().currentUser?.getIdToken();
 
       if (!token) {
-        setErrorMsg("Du måste vara inloggad för att ta bort en stad.");
+        setErrorMsg("Du måste vara inloggad för att ta bort en region.");
         return;
       }
       const response = await deleteRegionAPI(Number(id), token);
@@ -98,16 +98,21 @@ function RegionDetailView() {
         alignItems: "center",
       }}
     >
-      <h1>{region && "Namn: " + region.regions_name}</h1>
-      <p>{region && "Befolkning antal: " + region.regions_population}</p>
-      <ul>
-        {cities &&
-          cities.map((city) => (
-            <li key={city.cities_id}>
-              <Link to={`/city/${city.cities_id}`}>{city.cities_name}</Link>
-            </li>
-          ))}
-      </ul>
+      <section>
+        <h1>{region && "Region: " + region.regions_name}</h1>
+        <h2>Kommuner:</h2>
+        <ul>
+          {municipalities &&
+            municipalities.map((municipality) => (
+              <li key={municipality.municipalities_id}>
+                <Link to={`/municipality/${municipality.municipalities_id}`}>
+                  {municipality.municipalities_name}
+                </Link>
+              </li>
+            ))}
+        </ul>
+        <p>{region && "Befolkning antal: " + region.regions_population}</p>
+      </section>
       <section
         style={{
           display: "flex",

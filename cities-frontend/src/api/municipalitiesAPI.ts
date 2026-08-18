@@ -1,44 +1,45 @@
-import type { Region } from "../../../shared/types";
+import type { Municipality } from "../../../shared/types";
 
-const URL = "http://localhost:3001/regions";
+const URL = "http://localhost:3001/municipalities";
 
-export async function getRegionsAPI() {
+export async function getMunicipalitiesAPI() {
   const response = await fetch(URL);
   return response;
 }
 
-export async function getOneRegionAPI(id: number) {
+export async function getOneMunicipalityAPI(id: number) {
   const response = await fetch(`${URL}/${id}`);
   return response;
 }
 
-export async function sumOfRegions() {
+export async function sumOfMunicipalities() {
   const response = await fetch(`${URL}/sum`);
   return response;
 }
 
-export async function getMunicipalitiesFromRegion(id: number) {
-  const response = await fetch(`${URL}/municipalities/${id}`);
+export async function getCitiesFromMunicipalityAPI(id: number) {
+  const response = await fetch(`${URL}/cities/${id}`);
   return response;
 }
 
-export async function postRegionAPI(
-  body: Omit<Region, "regions_id">,
+export async function postMunicipalityAPI(
+  body: Omit<Municipality, "municipalities_id">,
   token: string,
 ) {
   const response = await fetch(URL, {
-    method: "post",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
   });
+
   return response;
 }
 
-export async function updateRegionAPI(
-  body: Omit<Region, "regions_id">,
+export async function updateMunicipalityAPI(
+  body: Omit<Municipality, "municipalities_id">,
   id: number,
   token: string,
 ) {
@@ -53,7 +54,7 @@ export async function updateRegionAPI(
   return response;
 }
 
-export async function deleteRegionAPI(id: number, token: string) {
+export async function deleteMunicipalityAPI(id: number, token: string) {
   const response = await fetch(`${URL}/${id}`, {
     method: "DELETE",
     headers: {

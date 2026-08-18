@@ -147,6 +147,7 @@ function RegionFormView() {
           <input
             id="populationInput"
             type="number"
+            placeholder="0"
             value={region.regions_population}
             required
             onChange={(e) =>

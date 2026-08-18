@@ -31,20 +31,20 @@ async function sumOfCities(_req: Request, res: Response, next: NextFunction) {
 }
 
 async function postCity(req: Request, res: Response, next: NextFunction) {
-  const { cities_name, cities_population, region } = req.body;
+  const { cities_name, cities_population, municipality_id } = req.body;
   if (typeof cities_name !== "string") {
     res.status(400).json({ error: "Invalid name" });
   }
-  if (!region) {
+  if (!municipality_id) {
     res
       .status(400)
-      .json({ error: "Du behöver ange vilken region staden tillhör." });
+      .json({ error: "Du behöver ange vilken kommun staden tillhör." });
   }
   try {
     const city = await service.postCity(
       cities_name,
       Number(cities_population),
-      region,
+      Number(municipality_id),
     );
     res.status(201).json(city);
   } catch (error) {
@@ -54,22 +54,22 @@ async function postCity(req: Request, res: Response, next: NextFunction) {
 
 async function updateCity(req: Request, res: Response, next: NextFunction) {
   const { id } = req.params;
-  const { cities_name, cities_population, region } = req.body;
+  const { cities_name, cities_population, municipality_id } = req.body;
 
   if (typeof cities_name !== "string") {
     res.status(400).json({ error: "Invalid name" });
   }
-  if (!region) {
+  if (!municipality_id) {
     res
       .status(400)
-      .json({ error: "Du behöver ange vilken region staden tillhör." });
+      .json({ error: "Du behöver ange vilken kommun staden tillhör." });
   }
 
   try {
     const response = await service.updateCity(
       cities_name,
       Number(cities_population),
-      region,
+      Number(municipality_id),
       Number(id),
     );
     if (!response) {
