@@ -1,14 +1,14 @@
 import express from "express";
-import * as db from "../controllers/regionController.ts";
+import * as controller from "../controllers/regionController.ts";
 import { authenticateToken } from "../middleware/authMiddleware.ts";
 const router = express.Router();
 
-router.get("/", db.getRegions);
-router.get("/sum", db.sumOfRegions_controller);
-router.get("/cities/:id", db.getCitiesFromRegion);
-router.get("/:id", db.getOneRegionAPI);
-router.post("/", authenticateToken, db.postRegion);
-router.put("/:id", authenticateToken, db.updateRegion);
-router.delete("/:id", authenticateToken, db.deleteRegion);
+router.get("/", controller.getRegions);
+router.get("/sum", controller.sumOfRegions);
+router.get("/cities/:id", controller.getCitiesFromRegion);
+router.get("/:id", controller.getOneRegionAPI);
+router.post("/", authenticateToken, controller.postRegion);
+router.put("/:id", authenticateToken, controller.updateRegion);
+router.delete("/:id", authenticateToken, controller.deleteRegion);
 
 export default router;

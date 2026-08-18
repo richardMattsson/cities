@@ -2,12 +2,12 @@ import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { cities } from "../db/schema.ts";
 
-async function selectAll() {
+async function getCities() {
   const response = await db.select().from(cities).orderBy(cities.cities_name);
   return response;
 }
 
-async function selectOne(id: number) {
+async function getOneCity(id: number) {
   const response = await db
     .select()
     .from(cities)
@@ -20,7 +20,7 @@ async function sumOfCities() {
   return response;
 }
 
-async function insertCity(name: string, population: number, region: string) {
+async function postCity(name: string, population: number, region: string) {
   const response = await db
     .insert(cities)
     .values({
@@ -32,7 +32,7 @@ async function insertCity(name: string, population: number, region: string) {
   return response;
 }
 
-async function updateCity_service(
+async function updateCity(
   name: string,
   population: number,
   region: string,
@@ -47,18 +47,11 @@ async function updateCity_service(
   return response;
 }
 
-async function deleteCity_service(id: number) {
+async function deleteCity(id: number) {
   const result = await db
     .delete(cities)
     .where(eq(cities.cities_id, id))
     .returning();
   return result;
 }
-export {
-  selectAll,
-  selectOne,
-  sumOfCities,
-  insertCity,
-  updateCity_service,
-  deleteCity_service,
-};
+export { getCities, getOneCity, sumOfCities, postCity, updateCity, deleteCity };

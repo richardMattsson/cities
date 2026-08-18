@@ -1,17 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
-import {
-  deleteCity_service,
-  insertCity,
-  selectAll,
-  selectOne,
-  sumOfCities,
-  updateCity_service,
-} from "../services/cityService.ts";
+import * as service from "../services/cityService.ts";
 import { HttpError } from "../errors/HttpError.ts";
 
 async function getCities(_req: Request, res: Response, next: NextFunction) {
   try {
-    const cities = await selectAll();
+    const cities = await service.getCities();
     res.json(cities);
   } catch (error) {
     next(error);
@@ -21,20 +14,16 @@ async function getCities(_req: Request, res: Response, next: NextFunction) {
 async function getOneCity(req: Request, res: Response, next: NextFunction) {
   const { id } = req.params;
   try {
-    const cities = await selectOne(Number(id));
+    const cities = await service.getOneCity(Number(id));
     res.json(cities);
   } catch (error) {
     next(error);
   }
 }
 
-async function sumOfCities_controller(
-  _req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+async function sumOfCities(_req: Request, res: Response, next: NextFunction) {
   try {
-    const response = await sumOfCities();
+    const response = await service.sumOfCities();
     res.status(200).json(response);
   } catch (error) {
     next(error);
@@ -52,7 +41,7 @@ async function postCity(req: Request, res: Response, next: NextFunction) {
       .json({ error: "Du behöver ange vilken region staden tillhör." });
   }
   try {
-    const city = await insertCity(
+    const city = await service.postCity(
       cities_name,
       Number(cities_population),
       region,
@@ -77,7 +66,7 @@ async function updateCity(req: Request, res: Response, next: NextFunction) {
   }
 
   try {
-    const response = await updateCity_service(
+    const response = await service.updateCity(
       cities_name,
       Number(cities_population),
       region,
@@ -95,18 +84,11 @@ async function updateCity(req: Request, res: Response, next: NextFunction) {
 async function deleteCity(req: Request, res: Response, next: NextFunction) {
   const { id } = req.params;
   try {
-    const result = await deleteCity_service(Number(id));
+    const result = await service.deleteCity(Number(id));
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 }
 
-export {
-  getCities,
-  getOneCity,
-  sumOfCities_controller,
-  postCity,
-  updateCity,
-  deleteCity,
-};
+export { getCities, getOneCity, sumOfCities, postCity, updateCity, deleteCity };

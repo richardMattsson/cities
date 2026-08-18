@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { cities, regions } from "../db/schema.ts";
 
-async function selectAll() {
+async function getRegions() {
   const response = await db
     .select()
     .from(regions)
@@ -10,7 +10,7 @@ async function selectAll() {
   return response;
 }
 
-async function selectOne(id: number) {
+async function getOneRegionAPI(id: number) {
   const response = await db
     .select()
     .from(regions)
@@ -23,7 +23,7 @@ async function sumOfRegions() {
   return response;
 }
 
-async function innerJoinCities(id: number) {
+async function getCitiesFromRegion(id: number) {
   const response = await db
     .select({
       cities_id: cities.cities_id,
@@ -37,7 +37,7 @@ async function innerJoinCities(id: number) {
   return response;
 }
 
-async function insertRegion(name: string, population: number) {
+async function postRegion(name: string, population: number) {
   const response = await db
     .insert(regions)
     .values({ regions_name: name, regions_population: population })
@@ -45,11 +45,7 @@ async function insertRegion(name: string, population: number) {
   return response;
 }
 
-async function updateRegion_service(
-  name: string,
-  population: number,
-  id: number,
-) {
+async function updateRegion(name: string, population: number, id: number) {
   const response = await db
     .update(regions)
     .set({ regions_name: name, regions_population: population })
@@ -59,7 +55,7 @@ async function updateRegion_service(
   return response;
 }
 
-async function deleteRegion_service(id: number) {
+async function deleteRegion(id: number) {
   const response = await db
     .delete(regions)
     .where(eq(regions.regions_id, id))
@@ -68,11 +64,11 @@ async function deleteRegion_service(id: number) {
   return response;
 }
 export {
-  selectAll,
-  selectOne,
+  getRegions,
+  getOneRegionAPI,
   sumOfRegions,
-  innerJoinCities,
-  insertRegion,
-  updateRegion_service,
-  deleteRegion_service,
+  getCitiesFromRegion,
+  postRegion,
+  updateRegion,
+  deleteRegion,
 };
