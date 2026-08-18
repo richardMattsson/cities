@@ -78,10 +78,13 @@ function App() {
               )}
               <hr />
               <li>
-                <Link to="/cities">Visa Städer</Link>
+                <Link to="/regions">Visa Regioner</Link>
               </li>
               <li>
-                <Link to="/regions">Visa Regioner</Link>
+                <Link to="/municipalities">Visa Kommuner</Link>
+              </li>
+              <li>
+                <Link to="/cities">Visa Städer</Link>
               </li>
               <hr />
               <li>

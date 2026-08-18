@@ -1,9 +1,9 @@
 import { startTransition, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { City, Region } from "../../../shared/types";
+import type { City, Municipality } from "../../../shared/types";
 import { getOneCityAPI, postCityAPI, updateCityAPI } from "../api/citiesAPI";
-import { getRegionsAPI } from "../api/regionsAPI";
 import { getAuth } from "firebase/auth";
+import { getMunicipalitiesAPI } from "../api/municipalitiesAPI";
 
 function CityFormView() {
   const { option, id } = useParams();
@@ -12,9 +12,9 @@ function CityFormView() {
     cities_id: 0,
     cities_name: "",
     cities_population: "",
-    region: "",
+    municipality: "",
   });
-  const [regions, setRegions] = useState<Region[]>([]);
+  const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
 
@@ -22,7 +22,7 @@ function CityFormView() {
     let mounted = true;
     (async () => {
       try {
-        const response = await getRegionsAPI();
+        const response = await getMunicipalitiesAPI();
         if (!response.ok) {
           console.log("error fetching resources");
           return;
@@ -30,7 +30,7 @@ function CityFormView() {
         const result = await response.json();
 
         if (!mounted) return;
-        startTransition(() => setRegions(result));
+        startTransition(() => setMunicipalities(result));
       } catch {
         if (mounted) return;
       }
@@ -69,10 +69,10 @@ function CityFormView() {
     e.preventDefault();
     setErrorMsg("");
     setSuccesMsg("");
-    const body = {
+    const body: Omit<City, "cities_id"> = {
       cities_name: city.cities_name,
       cities_population: city.cities_population,
-      region: city.region,
+      municipality: city.municipality,
     };
 
     try {
@@ -99,10 +99,10 @@ function CityFormView() {
   async function updateCity(e: React.SubmitEvent<HTMLFormElement>, id: number) {
     e.preventDefault();
 
-    const body = {
+    const body: Omit<City, "cities_id"> = {
       cities_name: city.cities_name,
       cities_population: city.cities_population,
-      region: city.region,
+      municipality: city.municipality,
     };
 
     try {
@@ -159,7 +159,7 @@ function CityFormView() {
                 cities_id: city.cities_id,
                 cities_name: e.target.value,
                 cities_population: city.cities_population,
-                region: city.region,
+                municipality: city.municipality,
               })
             }
             className="inputField"
@@ -172,6 +172,7 @@ function CityFormView() {
           <input
             id="populationInput"
             type="number"
+            placeholder="0"
             value={city.cities_population}
             required
             onChange={(e) =>
@@ -179,7 +180,7 @@ function CityFormView() {
                 cities_id: city.cities_id,
                 cities_name: city.cities_name,
                 cities_population: e.target.value,
-                region: city.region,
+                municipality: city.municipality,
               })
             }
             className="inputField"
@@ -198,18 +199,22 @@ function CityFormView() {
                 cities_id: city.cities_id,
                 cities_name: city.cities_name,
                 cities_population: city.cities_population,
-                region: e.target.value,
+                municipality: e.target.value,
               })
             }
             className="inputField"
+            value={city.municipality || ""}
           >
             <option value="" disabled>
               Välj
             </option>
-            {regions &&
-              regions.map((region) => (
-                <option key={region.regions_id} value={region.regions_name}>
-                  {region.regions_name}
+            {municipalities &&
+              municipalities.map((municipality) => (
+                <option
+                  key={municipality.municipalities_id}
+                  value={municipality.municipalities_name}
+                >
+                  {municipality.municipalities_name}
                 </option>
               ))}
           </select>

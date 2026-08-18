@@ -1,9 +1,9 @@
 import { startTransition, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { deleteCityAPI, getOneCityAPI } from "../api/citiesAPI";
-import type { City, Region } from "../../../shared/types";
-import { getRegionsAPI } from "../api/regionsAPI";
+import type { City, Municipality } from "../../../shared/types";
 import { getAuth } from "firebase/auth";
+import { getMunicipalitiesAPI } from "../api/municipalitiesAPI";
 
 function CityDetailView() {
   const { id } = useParams();
@@ -11,13 +11,15 @@ function CityDetailView() {
     cities_id: 0,
     cities_name: "",
     cities_population: "",
-    region: "",
+    municipality: "",
   });
-  const [regions, setRegions] = useState<Region[]>();
+  const [municipalities, setMunicipalities] = useState<Municipality[]>();
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
-  const region = regions?.find((region) => region.regions_name === city.region);
-  const regionId = region?.regions_id;
+  const municipality = municipalities?.find(
+    (municipality) => municipality.municipalities_name === city.municipality,
+  );
+  const municipalityId = municipality?.municipalities_id;
 
   useEffect(() => {
     let mounted = true;
@@ -31,7 +33,6 @@ function CityDetailView() {
         const result = await response.json();
 
         if (!mounted) return;
-        console.log(result);
 
         startTransition(() => setCity(result[0]));
       } catch {
@@ -47,7 +48,7 @@ function CityDetailView() {
     let mounted = true;
     (async () => {
       try {
-        const response = await getRegionsAPI();
+        const response = await getMunicipalitiesAPI();
         if (!response.ok) {
           console.log("error fetching resource");
           return;
@@ -56,7 +57,7 @@ function CityDetailView() {
 
         if (!mounted) return;
 
-        startTransition(() => setRegions(result));
+        startTransition(() => setMunicipalities(result));
       } catch {
         if (mounted) return;
       }
@@ -105,8 +106,8 @@ function CityDetailView() {
       <h1>{city && "Namn: " + city.cities_name}</h1>
       <p>{city && "Befolkning antal: " + city.cities_population}</p>
       <p>
-        <Link to={`/region/${regionId ?? ""}`}>
-          {city && "Region: " + city.region}
+        <Link to={`/municipality/${municipalityId ?? ""}`}>
+          {city && "Municipality: " + city.municipality}
         </Link>
       </p>
       <section

@@ -20,13 +20,17 @@ async function sumOfCities() {
   return response;
 }
 
-async function postCity(name: string, population: number, region: string) {
+async function postCity(
+  name: string,
+  population: number,
+  municipality: string,
+) {
   const response = await db
     .insert(cities)
     .values({
       cities_name: name,
       cities_population: population,
-      region,
+      municipality,
     })
     .returning();
   return response;
@@ -35,12 +39,12 @@ async function postCity(name: string, population: number, region: string) {
 async function updateCity(
   name: string,
   population: number,
-  region: string,
+  municipality: string,
   id: number,
 ) {
   const response = await db
     .update(cities)
-    .set({ cities_name: name, cities_population: population, region })
+    .set({ cities_name: name, cities_population: population, municipality })
     .where(eq(cities.cities_id, id))
     .returning();
 
