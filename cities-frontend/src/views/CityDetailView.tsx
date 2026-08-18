@@ -11,13 +11,13 @@ function CityDetailView() {
     cities_id: 0,
     cities_name: "",
     cities_population: "",
-    municipality: "",
+    municipality_id: 0,
   });
   const [municipalities, setMunicipalities] = useState<Municipality[]>();
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
   const municipality = municipalities?.find(
-    (municipality) => municipality.municipalities_name === city.municipality,
+    (municipality) => municipality.municipalities_id === city.municipality_id,
   );
   const municipalityId = municipality?.municipalities_id;
 
@@ -103,13 +103,16 @@ function CityDetailView() {
         padding: "10px",
       }}
     >
-      <h1>{city && "Namn: " + city.cities_name}</h1>
-      <p>{city && "Befolkning antal: " + city.cities_population}</p>
-      <p>
-        <Link to={`/municipality/${municipalityId ?? ""}`}>
-          {city && "Municipality: " + city.municipality}
-        </Link>
-      </p>
+      <section>
+        <h1>{city && "Stad: " + city.cities_name}</h1>
+        <h2>Kommun:</h2>
+        <p>
+          <Link to={`/municipality/${municipalityId ?? ""}`}>
+            {municipality && municipality.municipalities_name}
+          </Link>
+        </p>
+        <p>{city && "Befolkning antal: " + city.cities_population}</p>
+      </section>
       <section
         style={{
           display: "flex",

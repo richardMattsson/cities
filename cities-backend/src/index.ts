@@ -45,7 +45,7 @@ const port = 3001;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({ origin: "http://localhost:5174" }));
 
 app.get("/", (_request, response) => {
   response.json({ info: "Node.js, Express, and Postgres API" });

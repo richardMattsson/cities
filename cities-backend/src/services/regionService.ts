@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
-import { cities, regions } from "../db/schema.ts";
+import { cities, municipalities, regions } from "../db/schema.ts";
 
 async function getRegions() {
   const response = await db
@@ -23,17 +23,17 @@ async function sumOfRegions() {
   return response;
 }
 
-async function getCitiesFromRegion(id: number) {
+async function getMunicipalitiesFromRegion(id: number) {
   const response = await db
     .select({
-      cities_id: cities.cities_id,
-      cities_name: cities.cities_name,
+      municipalities_id: municipalities.municipalities_id,
+      municipalities_name: municipalities.municipalities_name,
       regions_name: regions.regions_name,
     })
-    .from(cities)
-    .innerJoin(regions, eq(cities.region, regions.regions_name))
+    .from(municipalities)
+    .innerJoin(regions, eq(municipalities.region_id, regions.regions_id))
     .where(eq(regions.regions_id, id))
-    .orderBy(cities.cities_name);
+    .orderBy(municipalities.municipalities_name);
   return response;
 }
 
@@ -67,7 +67,7 @@ export {
   getRegions,
   getOneRegionAPI,
   sumOfRegions,
-  getCitiesFromRegion,
+  getMunicipalitiesFromRegion,
   postRegion,
   updateRegion,
   deleteRegion,

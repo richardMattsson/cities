@@ -23,14 +23,14 @@ async function sumOfCities() {
 async function postCity(
   name: string,
   population: number,
-  municipality: string,
+  municipality_id: number,
 ) {
   const response = await db
     .insert(cities)
     .values({
       cities_name: name,
       cities_population: population,
-      municipality,
+      municipality_id,
     })
     .returning();
   return response;
@@ -39,12 +39,12 @@ async function postCity(
 async function updateCity(
   name: string,
   population: number,
-  municipality: string,
+  municipality_id: number,
   id: number,
 ) {
   const response = await db
     .update(cities)
-    .set({ cities_name: name, cities_population: population, municipality })
+    .set({ cities_name: name, cities_population: population, municipality_id })
     .where(eq(cities.cities_id, id))
     .returning();
 

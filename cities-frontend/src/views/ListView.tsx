@@ -18,8 +18,6 @@ export default function ListView() {
       return <RegionsView />;
     default:
   }
-
-  return options === "cities" ? <CitiesView /> : <RegionsView />;
 }
 
 function CitiesView() {

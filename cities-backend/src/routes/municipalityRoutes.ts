@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.get("/", controller.getMunicipalities);
 router.get("/sum", controller.sumOfMunicipalities);
+router.get("/cities/:id", controller.getCitiesFromMunicipality);
 router.get("/:id", controller.getOneMunicipality);
 router.post("/", authenticateToken, controller.postMunicipality);
 router.put("/:id", authenticateToken, controller.updateMunicipality);

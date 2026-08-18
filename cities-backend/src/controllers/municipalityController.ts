@@ -42,16 +42,31 @@ async function sumOfMunicipalities(
   }
 }
 
+async function getCitiesFromMunicipality(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const { id } = req.params;
+  try {
+    const response = await service.getCitiesFromMunicipality(Number(id));
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function postMunicipality(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
-  const { municipalities_name, municipalities_population, region } = req.body;
+  const { municipalities_name, municipalities_population, region_id } =
+    req.body;
   if (typeof municipalities_name !== "string") {
     res.status(400).json({ error: "Invalid name" });
   }
-  if (!region) {
+  if (!region_id) {
     res
       .status(400)
       .json({ error: "Du behöver ange vilken region kommunen tillhör." });
@@ -60,7 +75,7 @@ async function postMunicipality(
     const response = await service.postMunicipality(
       municipalities_name,
       Number(municipalities_population),
-      region,
+      Number(region_id),
     );
     res.status(201).json(response);
   } catch (error) {
@@ -74,12 +89,13 @@ async function updateMunicipality(
   next: NextFunction,
 ) {
   const { id } = req.params;
-  const { municipalities_name, municipalities_population, region } = req.body;
+  const { municipalities_name, municipalities_population, region_id } =
+    req.body;
 
   if (typeof municipalities_name !== "string") {
     res.status(400).json({ error: "Invalid name" });
   }
-  if (!region) {
+  if (!region_id) {
     res
       .status(400)
       .json({ error: "Du behöver ange vilken region kommunen tillhör." });
@@ -89,14 +105,28 @@ async function updateMunicipality(
     const response = await service.updateMunicipality(
       municipalities_name,
       Number(municipalities_population),
-      region,
+      Number(region_id),
       Number(id),
     );
     if (!response) {
       return next(new HttpError(404, "Kommun not found"));
     }
+
     res.status(200).json(response);
   } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.name === "DrizzleQueryError" ||
+        (error as any).code === "23503" ||
+        /foreign key/i.test(error.message))
+    ) {
+      return next(
+        new HttpError(
+          409,
+          "Kan inte uppdatera kommunen: det finns ett problem med den angivna regionen.",
+        ),
+      );
+    }
     next(error);
   }
 }
@@ -119,6 +149,7 @@ export {
   getMunicipalities,
   getOneMunicipality,
   sumOfMunicipalities,
+  getCitiesFromMunicipality,
   postMunicipality,
   updateMunicipality,
   deleteMunicipality,

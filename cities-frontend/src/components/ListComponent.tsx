@@ -21,35 +21,38 @@ function ListComponent({ cities, municipalities, regions }: ItemsListProps) {
       {options === "cities" && <h2>Städer lista</h2>}
       {options === "municipalities" && <h2>Kommuner lista</h2>}
       {options === "regions" && <h2>Regioner lista</h2>}
-      {cities && (
+      {options === "cities" && (
         <ul>
-          {cities.map((city) => (
-            <li key={city.cities_id}>
-              <Link to={`/city/${city.cities_id}`}>{city.cities_name}</Link>
-            </li>
-          ))}
+          {cities &&
+            cities.map((city) => (
+              <li key={city.cities_id}>
+                <Link to={`/city/${city.cities_id}`}>{city.cities_name}</Link>
+              </li>
+            ))}
         </ul>
       )}
-      {municipalities && (
+      {options === "municipalities" && (
         <ul>
-          {municipalities.map((municipality) => (
-            <li key={municipality.municipalities_id}>
-              <Link to={`/municipality/${municipality.municipalities_id}`}>
-                {municipality.municipalities_name}
-              </Link>
-            </li>
-          ))}
+          {municipalities &&
+            municipalities.map((municipality) => (
+              <li key={municipality.municipalities_id}>
+                <Link to={`/municipality/${municipality.municipalities_id}`}>
+                  {municipality.municipalities_name}
+                </Link>
+              </li>
+            ))}
         </ul>
       )}
-      {regions && (
+      {options === "regions" && (
         <ul>
-          {regions.map((region) => (
-            <li key={region.regions_id}>
-              <Link to={`/city/${region.regions_id}`}>
-                {region.regions_name}
-              </Link>
-            </li>
-          ))}
+          {regions &&
+            regions.map((region) => (
+              <li key={region.regions_id}>
+                <Link to={`/region/${region.regions_id}`}>
+                  {region.regions_name}
+                </Link>
+              </li>
+            ))}
         </ul>
       )}
     </article>

@@ -8,12 +8,12 @@ export interface Municipality {
   municipalities_id: number;
   municipalities_name: string;
   municipalities_population: number | string;
-  region: string;
+  region_id: number;
 }
 
 export interface City {
   cities_id: number;
   cities_name: string;
   cities_population: number | string;
-  municipality: string;
+  municipality_id: number;
 }

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.ts";
-import { municipalities } from "../db/schema.ts";
+import { cities, municipalities } from "../db/schema.ts";
 
 async function getMunicipalities() {
   const response = await db
@@ -23,17 +23,34 @@ async function sumOfMunicipalities() {
   return response;
 }
 
+async function getCitiesFromMunicipality(id: number) {
+  const response = await db
+    .select({
+      cities_id: cities.cities_id,
+      cities_name: cities.cities_name,
+      municipalities_name: municipalities.municipalities_name,
+    })
+    .from(cities)
+    .innerJoin(
+      municipalities,
+      eq(cities.municipality_id, municipalities.municipalities_id),
+    )
+    .where(eq(municipalities.municipalities_id, id))
+    .orderBy(cities.cities_name);
+  return response;
+}
+
 async function postMunicipality(
   name: string,
   population: number,
-  region: string,
+  region_id: number,
 ) {
   const response = await db
     .insert(municipalities)
     .values({
       municipalities_name: name,
       municipalities_population: population,
-      region,
+      region_id,
     })
     .returning();
   return response;
@@ -42,7 +59,7 @@ async function postMunicipality(
 async function updateMunicipality(
   name: string,
   population: number,
-  region: string,
+  region_id: number,
   id: number,
 ) {
   const response = await db
@@ -50,7 +67,7 @@ async function updateMunicipality(
     .set({
       municipalities_name: name,
       municipalities_population: population,
-      region,
+      region_id,
     })
     .where(eq(municipalities.municipalities_id, id))
     .returning();
@@ -69,6 +86,7 @@ export {
   getMunicipalities,
   getOneMunicipality,
   sumOfMunicipalities,
+  getCitiesFromMunicipality,
   postMunicipality,
   updateMunicipality,
   deleteMunicipality,

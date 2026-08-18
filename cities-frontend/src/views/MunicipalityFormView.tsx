@@ -1,20 +1,25 @@
 import { startTransition, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import type { City, Municipality } from "../../../shared/types";
-import { getOneCityAPI, postCityAPI, updateCityAPI } from "../api/citiesAPI";
-import { getAuth } from "firebase/auth";
-import { getMunicipalitiesAPI } from "../api/municipalitiesAPI";
+import type { Municipality, Region } from "../../../shared/types";
 
-function CityFormView() {
+import { getAuth } from "firebase/auth";
+import {
+  getOneMunicipalityAPI,
+  postMunicipalityAPI,
+  updateMunicipalityAPI,
+} from "../api/municipalitiesAPI";
+import { getRegionsAPI } from "../api/regionsAPI";
+
+function MunicipalityFormView() {
   const { option, id } = useParams();
   const add = option === "add";
-  const [city, setCity] = useState<City>({
-    cities_id: 0,
-    cities_name: "",
-    cities_population: "",
-    municipality_id: 0,
+  const [municipality, setMunicipality] = useState<Municipality>({
+    municipalities_id: 0,
+    municipalities_name: "",
+    municipalities_population: "",
+    region_id: 0,
   });
-  const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
+  const [regions, setRegions] = useState<Region[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
 
@@ -22,7 +27,7 @@ function CityFormView() {
     let mounted = true;
     (async () => {
       try {
-        const response = await getMunicipalitiesAPI();
+        const response = await getRegionsAPI();
         if (!response.ok) {
           console.log("error fetching resources");
           return;
@@ -30,7 +35,7 @@ function CityFormView() {
         const result = await response.json();
 
         if (!mounted) return;
-        startTransition(() => setMunicipalities(result));
+        startTransition(() => setRegions(result));
       } catch {
         if (mounted) return;
       }
@@ -47,7 +52,7 @@ function CityFormView() {
     let mounted = true;
     (async () => {
       try {
-        const response = await getOneCityAPI(Number(id));
+        const response = await getOneMunicipalityAPI(Number(id));
         if (!response.ok) {
           console.log("error fetching resources");
           return;
@@ -55,7 +60,7 @@ function CityFormView() {
         const result = await response.json();
 
         if (!mounted) return;
-        startTransition(() => setCity(result[0]));
+        startTransition(() => setMunicipality(result[0]));
       } catch {
         if (mounted) return;
       }
@@ -65,64 +70,68 @@ function CityFormView() {
     };
   }, [id, add]);
 
-  async function postCity(e: React.SubmitEvent<HTMLFormElement>) {
+  async function postMunicipality(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrorMsg("");
     setSuccesMsg("");
-    const body: Omit<City, "cities_id"> = {
-      cities_name: city.cities_name,
-      cities_population: city.cities_population,
-      municipality_id: city.municipality_id,
+    const body: Omit<Municipality, "municipalities_id"> = {
+      municipalities_name: municipality.municipalities_name,
+      municipalities_population: municipality.municipalities_population,
+      region_id: municipality.region_id,
     };
 
     try {
       const token = await getAuth().currentUser?.getIdToken();
 
       if (!token) {
-        setErrorMsg("Du måste vara inloggad för att skapa en stad.");
+        setErrorMsg("Du måste vara inloggad för att skapa en kommun.");
         return;
       }
-      const response = await postCityAPI(body, token);
+      const response = await postMunicipalityAPI(body, token);
       const result = await response.json();
       if (!response.ok) {
         setErrorMsg(result.error);
         return;
       }
 
-      setSuccesMsg("Du har skapat en ny stad!");
+      setSuccesMsg("Du har skapat en ny kommun!");
     } catch {
       setErrorMsg("Något gick fel.");
       return;
     }
   }
 
-  async function updateCity(e: React.SubmitEvent<HTMLFormElement>, id: number) {
+  async function updateMunicipality(
+    e: React.SubmitEvent<HTMLFormElement>,
+    id: number,
+  ) {
     e.preventDefault();
-    setErrorMsg("");
-    setSuccesMsg("");
 
-    const body: Omit<City, "cities_id"> = {
-      cities_name: city.cities_name,
-      cities_population: city.cities_population,
-      municipality_id: city.municipality_id,
+    const body: Omit<Municipality, "municipalities_id"> = {
+      municipalities_name: municipality.municipalities_name,
+      municipalities_population: municipality.municipalities_population,
+      region_id: municipality.region_id,
     };
+
+    console.log(body);
 
     try {
       const token = await getAuth().currentUser?.getIdToken();
 
       if (!token) {
-        setErrorMsg("Du måste vara inloggad för att uppdatera en stad.");
+        setErrorMsg("Du måste vara inloggad för att uppdatera en kommun.");
         return;
       }
 
-      const response = await updateCityAPI(body, id, token);
+      const response = await updateMunicipalityAPI(body, id, token);
+      const result = await response.json();
 
       if (!response.ok) {
-        console.log("error fetching resource");
+        setErrorMsg(result.error);
         return;
       }
 
-      setSuccesMsg("Du har uppdaterat en stad");
+      setSuccesMsg("Du har uppdaterat en kommun");
     } catch (error) {
       setErrorMsg("Något gick fel.");
       console.log(error);
@@ -137,9 +146,13 @@ function CityFormView() {
         padding: "10px",
       }}
     >
-      <h2>{add ? "Skapa ny stad" : "Uppdatera stad"}</h2>
+      <h2>{add ? "Skapa ny kommun" : "Uppdatera kommun"}</h2>
       <form
-        onSubmit={add ? (e) => postCity(e) : (e) => updateCity(e, Number(id))}
+        onSubmit={
+          add
+            ? (e) => postMunicipality(e)
+            : (e) => updateMunicipality(e, Number(id))
+        }
         style={{
           display: "flex",
           flexDirection: "column",
@@ -148,21 +161,22 @@ function CityFormView() {
         }}
       >
         <section className="inputSection">
-          <label htmlFor="cityInput" className="labelForm">
+          <label htmlFor="municipalityInput" className="labelForm">
             Stad:
           </label>
           <input
-            id="cityInput"
+            id="municipalityInput"
             type="text"
-            placeholder="Stad"
-            value={city.cities_name}
+            placeholder="Kommun"
+            value={municipality.municipalities_name}
             required
             onChange={(e) =>
-              setCity({
-                cities_id: city.cities_id,
-                cities_name: e.target.value,
-                cities_population: city.cities_population,
-                municipality_id: city.municipality_id,
+              setMunicipality({
+                municipalities_id: municipality.municipalities_id,
+                municipalities_name: e.target.value,
+                municipalities_population:
+                  municipality.municipalities_population,
+                region_id: municipality.region_id,
               })
             }
             className="inputField"
@@ -176,14 +190,14 @@ function CityFormView() {
             id="populationInput"
             type="number"
             placeholder="0"
-            value={city.cities_population}
+            value={municipality.municipalities_population}
             required
             onChange={(e) =>
-              setCity({
-                cities_id: city.cities_id,
-                cities_name: city.cities_name,
-                cities_population: e.target.value,
-                municipality_id: city.municipality_id,
+              setMunicipality({
+                municipalities_id: municipality.municipalities_id,
+                municipalities_name: municipality.municipalities_name,
+                municipalities_population: e.target.value,
+                region_id: municipality.region_id,
               })
             }
             className="inputField"
@@ -191,33 +205,31 @@ function CityFormView() {
         </section>
         <section className="inputSection">
           <label htmlFor="populationInput" className="labelForm">
-            Kommun:
+            Region:
           </label>
           <select
             name=""
             id=""
             required
             onChange={(e) =>
-              setCity({
-                cities_id: city.cities_id,
-                cities_name: city.cities_name,
-                cities_population: city.cities_population,
-                municipality_id: Number(e.target.value),
+              setMunicipality({
+                municipalities_id: municipality.municipalities_id,
+                municipalities_name: municipality.municipalities_name,
+                municipalities_population:
+                  municipality.municipalities_population,
+                region_id: Number(e.target.value),
               })
             }
             className="inputField"
-            value={city.municipality_id || ""}
+            value={municipality.region_id || ""}
           >
             <option value="" disabled>
               Välj
             </option>
-            {municipalities &&
-              municipalities.map((municipality) => (
-                <option
-                  key={municipality.municipalities_id}
-                  value={municipality.municipalities_id}
-                >
-                  {municipality.municipalities_name}
+            {regions &&
+              regions.map((region) => (
+                <option key={region.regions_id} value={region.regions_id}>
+                  {region.regions_name}
                 </option>
               ))}
           </select>
@@ -238,4 +250,4 @@ function CityFormView() {
     </article>
   );
 }
-export default CityFormView;
+export default MunicipalityFormView;

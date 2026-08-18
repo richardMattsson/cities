@@ -1,11 +1,4 @@
-import { integer, pgTable, varchar, text } from "drizzle-orm/pg-core";
-
-export const usersTable = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: varchar({ length: 255 }).notNull(),
-  age: integer().notNull(),
-  email: varchar({ length: 255 }).notNull().unique(),
-});
+import { integer, pgTable, text } from "drizzle-orm/pg-core";
 
 export const regions = pgTable("regions", {
   regions_id: integer().primaryKey().generatedAlwaysAsIdentity(),
@@ -17,12 +10,21 @@ export const municipalities = pgTable("municipalities", {
   municipalities_id: integer().primaryKey().generatedAlwaysAsIdentity(),
   municipalities_name: text().notNull().unique(),
   municipalities_population: integer(),
-  region: text().references(() => regions.regions_name),
+  region_id: integer().references(() => regions.regions_id, {
+    onDelete: "cascade",
+    onUpdate: "cascade",
+  }),
 });
 
 export const cities = pgTable("cities", {
   cities_id: integer().primaryKey().generatedAlwaysAsIdentity(),
   cities_name: text().notNull(),
   cities_population: integer(),
-  municipality: text().references(() => municipalities.municipalities_name),
+  municipality_id: integer().references(
+    () => municipalities.municipalities_id,
+    {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    },
+  ),
 });

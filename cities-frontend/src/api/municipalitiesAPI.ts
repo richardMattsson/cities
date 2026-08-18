@@ -1,4 +1,4 @@
-import type { City, Municipality } from "../../../shared/types";
+import type { Municipality } from "../../../shared/types";
 
 const URL = "http://localhost:3001/municipalities";
 
@@ -14,6 +14,11 @@ export async function getOneMunicipalityAPI(id: number) {
 
 export async function sumOfMunicipalities() {
   const response = await fetch(`${URL}/sum`);
+  return response;
+}
+
+export async function getCitiesFromMunicipalityAPI(id: number) {
+  const response = await fetch(`${URL}/cities/${id}`);
   return response;
 }
 
@@ -33,8 +38,8 @@ export async function postMunicipalityAPI(
   return response;
 }
 
-export async function updateCityAPI(
-  body: Omit<City, "municipalities_id">,
+export async function updateMunicipalityAPI(
+  body: Omit<Municipality, "municipalities_id">,
   id: number,
   token: string,
 ) {
@@ -49,7 +54,7 @@ export async function updateCityAPI(
   return response;
 }
 
-export async function deleteCityAPI(id: number, token: string) {
+export async function deleteMunicipalityAPI(id: number, token: string) {
   const response = await fetch(`${URL}/${id}`, {
     method: "DELETE",
     headers: {
