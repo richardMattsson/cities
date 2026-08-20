@@ -1,0 +1,37 @@
+services:  
+  cities-frontend:
+    build:
+      context: .
+      dockerfile: cities-frontend/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - cities-backend
+
+  cities-backend:
+    build: ./cities-backend
+    ports:
+      - "3001:3001"
+    depends_on:
+      cities-database:
+        condition: service_healthy
+    environment:
+      DB_USER: ${DB_USER}
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
+
+  cities-database:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      interval: 5s
+      retries: 5
+      test: ["CMD-SHELL", "pg_isready --username=${DB_USER} --dbname=${DB_NAME}"]
+    volumes:
+      - ./data:/var/lib/postgresql

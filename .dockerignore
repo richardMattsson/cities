@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+**/node_modules
+**/dist
+cities-backend
+cities-frontend/firebase
+cities-backend/firebase
+**/*.log
