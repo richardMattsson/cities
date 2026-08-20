@@ -18,7 +18,7 @@ function Navbar() {
 
   return (
     <nav className="Navbar-nav">
-      <ul className="Navbar-ul Navbar-ul-home">
+      <ul className="Navbar-ul">
         <CustomLink to="/">Hem</CustomLink>
 
         {user ? (
@@ -41,12 +41,12 @@ function Navbar() {
           </>
         )}
       </ul>
-      <ul className="Navbar-ul Navbar-ul-show">
+      <ul className="Navbar-ul">
         <CustomLink to="/regions">Visa Regioner</CustomLink>
         <CustomLink to="/municipalities">Visa Kommuner</CustomLink>
         <CustomLink to="/cities">Visa Städer</CustomLink>
       </ul>
-      <ul className="Navbar-ul Navbar-ul-create">
+      <ul className="Navbar-ul">
         <CustomLink to="/city-form/add">Skapa ny stad</CustomLink>
         <CustomLink to="/municipality-form/add">Skapa ny kommun</CustomLink>
         <CustomLink to="/region-form/add">Skapa ny region</CustomLink>

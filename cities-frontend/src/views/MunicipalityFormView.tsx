@@ -182,7 +182,7 @@ function MunicipalityFormView() {
         </section>
         <section className="inputSection">
           <label htmlFor="populationInput" className="labelForm">
-            Antal invånare:{" "}
+            Befolning:
           </label>
           <input
             id="populationInput"

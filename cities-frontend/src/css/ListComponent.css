@@ -1,0 +1,27 @@
+.list-ul {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  list-style: none;
+  color: var(--text);
+}
+@media (max-width: 768px) {
+  .list-ul {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.list-ul a {
+  text-decoration: none;
+  color: inherit;
+  min-width: 100px;
+}
+
+.list-ul li {
+  padding: 0.5em;
+}
+
+.list-ul li:hover {
+  background-color: var(--hover);
+  color: var(--text-h);
+}
