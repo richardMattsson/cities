@@ -6,6 +6,9 @@
   "type": "module",
   "scripts": {
     "seed": "tsx drizzle/seed.ts",
+    "db:push": "drizzle-kit push",
+    "db:seed": "tsx drizzle/seed.ts",
+    "build": "tsc --outDir dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
