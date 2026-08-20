@@ -2,9 +2,11 @@ import { startTransition, useEffect, useState } from "react";
 import { sumOfCities } from "../api/citiesAPI";
 import { sumOfRegions } from "../api/regionsAPI";
 import { Link } from "react-router-dom";
+import { sumOfMunicipalities } from "../api/municipalitiesAPI";
 
 function HomeView() {
   const [sumCities, setSumCities] = useState();
+  const [sumMunicipalities, setSumMunicipalities] = useState();
   const [sumRegions, setSumRegions] = useState();
   useEffect(() => {
     let mounted = true;
@@ -20,6 +22,22 @@ function HomeView() {
         const result = await response.json();
         if (!mounted) return;
         startTransition(() => setSumCities(result));
+      } catch {
+        if (mounted) return;
+      }
+    })();
+    (async () => {
+      try {
+        const response = await sumOfMunicipalities();
+
+        if (!response.ok) {
+          console.log("error fetching resources");
+          return;
+        }
+
+        const result = await response.json();
+        if (!mounted) return;
+        startTransition(() => setSumMunicipalities(result));
       } catch {
         if (mounted) return;
       }
@@ -50,6 +68,9 @@ function HomeView() {
       <h1>Home</h1>
       <p>
         Antal <Link to={"/cities"}>Städer:</Link> {sumCities}
+      </p>
+      <p>
+        Antal <Link to={"/municipalities"}>Kommuner:</Link> {sumMunicipalities}
       </p>
       <p>
         Antal <Link to={"/regions"}>Regioner:</Link> {sumRegions}
