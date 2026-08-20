@@ -1,0 +1,36 @@
+.Navbar-nav {
+  padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: space-evenly;
+  color: var(--text);
+}
+.Navbar-ul {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 10px;
+  padding: 0;
+  padding-right: 0.5rem;
+  list-style: none;
+  border-right: 1px solid var(--text);
+  min-width: 150px;
+}
+
+.Navbar-ul a {
+  text-decoration-line: none;
+  color: inherit;
+}
+
+.Navbar-ul li {
+  padding: 0.25rem;
+}
+
+.Navbar-nav li.active {
+  background-color: #333;
+}
+
+.Navbar-nav li:hover {
+  background-color: #555;
+}

@@ -4,8 +4,6 @@
 #mainContent {
   flex-grow: 1;
 }
-#navigation {
-}
 
 .inputSection {
   display: flex;

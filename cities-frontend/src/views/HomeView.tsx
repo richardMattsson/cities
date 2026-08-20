@@ -3,6 +3,7 @@ import { sumOfCities } from "../api/citiesAPI";
 import { sumOfRegions } from "../api/regionsAPI";
 import { Link } from "react-router-dom";
 import { sumOfMunicipalities } from "../api/municipalitiesAPI";
+import "../css/HomeView.css";
 
 function HomeView() {
   const [sumCities, setSumCities] = useState();
@@ -64,7 +65,7 @@ function HomeView() {
     };
   }, []);
   return (
-    <>
+    <article className="home-container">
       <h1>Home</h1>
       <p>
         Antal <Link to={"/cities"}>Städer:</Link> {sumCities}
@@ -75,7 +76,7 @@ function HomeView() {
       <p>
         Antal <Link to={"/regions"}>Regioner:</Link> {sumRegions}
       </p>
-    </>
+    </article>
   );
 }
 export default HomeView;
