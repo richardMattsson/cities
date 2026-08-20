@@ -113,8 +113,6 @@ function MunicipalityFormView() {
       region_id: municipality.region_id,
     };
 
-    console.log(body);
-
     try {
       const token = await getAuth().currentUser?.getIdToken();
 

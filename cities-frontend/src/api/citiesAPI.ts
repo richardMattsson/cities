@@ -1,6 +1,6 @@
 import type { City } from "../../../shared/types";
 
-const URL = "http://localhost:3001/cities";
+const URL = "/api/cities";
 
 export async function getCitiesAPI() {
   const response = await fetch(URL);

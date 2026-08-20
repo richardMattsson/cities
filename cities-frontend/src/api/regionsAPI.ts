@@ -1,6 +1,6 @@
 import type { Region } from "../../../shared/types";
 
-const URL = "http://localhost:3001/regions";
+const URL = "/api/regions";
 
 export async function getRegionsAPI() {
   const response = await fetch(URL);

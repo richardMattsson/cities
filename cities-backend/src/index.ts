@@ -6,7 +6,6 @@ import express, {
 import citiesRoutes from "./routes/citiesRoutes.ts";
 import municipalityRoutes from "./routes/municipalityRoutes.ts";
 import regionRoutes from "./routes/regionRoutes.ts";
-import cors from "cors";
 import { HttpError } from "./errors/HttpError.ts";
 import dotenv from "dotenv";
 import { initializeApp, cert } from "firebase-admin/app";
@@ -45,15 +44,14 @@ const port = 3001;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: "http://localhost:8080" }));
 
 app.get("/", (_request, response) => {
   response.json({ info: "Node.js, Express, and Postgres API" });
 });
 
-app.use("/regions", regionRoutes);
-app.use("/municipalities", municipalityRoutes);
-app.use("/cities", citiesRoutes);
+app.use("/api/regions", regionRoutes);
+app.use("/api/municipalities", municipalityRoutes);
+app.use("/api/cities", citiesRoutes);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error("Error:", err.message);

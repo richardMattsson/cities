@@ -50,7 +50,6 @@ function RegionDetailView() {
         const result = await response.json();
 
         if (!mounted) return;
-        console.log(result);
 
         startTransition(() => setMunicipalities(result));
       } catch {
