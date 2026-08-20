@@ -144,3 +144,5 @@ vite.config.ts.timestamp-*
 
 # Firebase setup
 cities-demo-auth-firebase-adminsdk.json
+
+data
