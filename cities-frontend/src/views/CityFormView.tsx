@@ -4,6 +4,9 @@ import type { City, Municipality } from "../../../shared/types";
 import { getOneCityAPI, postCityAPI, updateCityAPI } from "../api/citiesAPI";
 import { getAuth } from "firebase/auth";
 import { getMunicipalitiesAPI } from "../api/municipalitiesAPI";
+import "../css/FormView.css";
+import FormInput from "../components/FormInput";
+import FormSelect from "../components/FormSelect";
 
 function CityFormView() {
   const { option, id } = useParams();
@@ -128,114 +131,51 @@ function CityFormView() {
       console.log(error);
     }
   }
+
   return (
-    <article
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "10px",
-      }}
-    >
+    <article className="form-container">
       <h2>{add ? "Skapa ny stad" : "Uppdatera stad"}</h2>
       <form
         onSubmit={add ? (e) => postCity(e) : (e) => updateCity(e, Number(id))}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "80%",
-          gap: "5px",
-        }}
+        className="form-style"
       >
-        <section className="inputSection">
-          <label htmlFor="cityInput" className="labelForm">
-            Stad:
-          </label>
-          <input
-            id="cityInput"
-            type="text"
-            placeholder="Stad"
-            value={city.cities_name}
-            required
-            onChange={(e) =>
-              setCity({
-                cities_id: city.cities_id,
-                cities_name: e.target.value,
-                cities_population: city.cities_population,
-                municipality_id: city.municipality_id,
-              })
-            }
-            className="inputField"
-          />
-        </section>
-        <section className="inputSection">
-          <label htmlFor="populationInput" className="labelForm">
-            Befolkning:
-          </label>
-          <input
-            id="populationInput"
-            type="number"
-            placeholder="0"
-            value={city.cities_population}
-            required
-            onChange={(e) =>
-              setCity({
-                cities_id: city.cities_id,
-                cities_name: city.cities_name,
-                cities_population: e.target.value,
-                municipality_id: city.municipality_id,
-              })
-            }
-            className="inputField"
-          />
-        </section>
-        <section className="inputSection">
-          <label htmlFor="populationInput" className="labelForm">
-            Kommun:
-          </label>
-          <select
-            name=""
-            id=""
-            required
-            onChange={(e) =>
-              setCity({
-                cities_id: city.cities_id,
-                cities_name: city.cities_name,
-                cities_population: city.cities_population,
-                municipality_id: Number(e.target.value),
-              })
-            }
-            className="inputField"
-            value={city.municipality_id || ""}
-          >
-            <option value="" disabled>
-              Välj
-            </option>
-            {municipalities &&
-              municipalities.map((municipality) => (
-                <option
-                  key={municipality.municipalities_id}
-                  value={municipality.municipalities_id}
-                >
-                  {municipality.municipalities_name}
-                </option>
-              ))}
-          </select>
-        </section>
-        <input
-          type="submit"
-          value="Skicka"
-          style={{
-            width: "fit-content",
-            alignSelf: "end",
-            margin: "10px",
-            padding: "5px",
-          }}
+        <FormInput
+          id={String(city.cities_id)}
+          label="Stad"
+          value={city.cities_name}
+          setValue={(e) => setCity({ ...city, cities_name: e })}
         />
+        <FormInput
+          id={String(city.cities_id)}
+          label="Befolkning"
+          value={city.cities_population}
+          setValue={(e: string | number) =>
+            setCity({ ...city, cities_population: e })
+          }
+        />
+        <FormSelect
+          id={String(city.cities_id)}
+          label="Kommun"
+          setValue={(e) => setCity({ ...city, municipality_id: e })}
+          value={city.municipality_id}
+          children={
+            municipalities &&
+            municipalities.map((municipality) => (
+              <option
+                key={municipality.municipalities_id}
+                value={municipality.municipalities_id}
+              >
+                {municipality.municipalities_name}
+              </option>
+            ))
+          }
+        />
+        <input type="submit" value="Skicka" className="form-submit" />
       </form>
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
     </article>
   );
 }
+
 export default CityFormView;

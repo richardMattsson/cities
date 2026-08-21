@@ -7,6 +7,8 @@ import {
   updateRegionAPI,
 } from "../api/regionsAPI";
 import { getAuth } from "firebase/auth";
+import FormInput from "../components/FormInput";
+import "../css/FormView.css";
 
 function RegionFormView() {
   const { option, id } = useParams();
@@ -100,80 +102,32 @@ function RegionFormView() {
     }
   }
   return (
-    <article
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "10px",
-      }}
-    >
+    <article className="form-container">
       <h2>{add ? "Skapa ny region" : "Uppdatera region"}</h2>
       <form
         onSubmit={
           add ? (e) => postRegion(e) : (e) => updateRegion(e, Number(id))
         }
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "80%",
-          gap: "5px",
-        }}
+        className="form-style"
       >
-        <section className="inputSection">
-          <label htmlFor="regionInput" className="labelForm">
-            Region:{" "}
-          </label>
-          <input
-            id="regionInput"
-            type="text"
-            placeholder="Region"
-            value={region.regions_name}
-            required
-            onChange={(e) =>
-              setRegion({
-                regions_id: region.regions_id,
-                regions_name: e.target.value,
-                regions_population: region.regions_population,
-              })
-            }
-            className="inputField"
-          />
-        </section>
-        <section className="inputSection">
-          <label htmlFor="populationInput" className="labelForm">
-            Befolkning:
-          </label>
-          <input
-            id="populationInput"
-            type="number"
-            placeholder="0"
-            value={region.regions_population}
-            required
-            onChange={(e) =>
-              setRegion({
-                regions_id: region.regions_id,
-                regions_name: region.regions_name,
-                regions_population: e.target.value,
-              })
-            }
-            className="inputField"
-          />
-        </section>
-        <input
-          type="submit"
-          value={"Skicka"}
-          style={{
-            width: "fit-content",
-            alignSelf: "end",
-            margin: "10px",
-            padding: "5px",
-          }}
+        <FormInput
+          id={String(region.regions_id)}
+          label="Region"
+          value={region.regions_name}
+          setValue={(e) => setRegion({ ...region, regions_name: e })}
         />
+        <FormInput
+          id={String(region.regions_id)}
+          label="Befolkning"
+          value={region.regions_population}
+          setValue={(e) => setRegion({ ...region, regions_population: e })}
+        />
+        <input type="submit" value="Skicka" className="form-submit" />
       </form>
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
     </article>
   );
 }
+
 export default RegionFormView;

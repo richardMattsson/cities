@@ -9,6 +9,9 @@ import {
   updateMunicipalityAPI,
 } from "../api/municipalitiesAPI";
 import { getRegionsAPI } from "../api/regionsAPI";
+import FormInput from "../components/FormInput";
+import FormSelect from "../components/FormSelect";
+import "../css/FormView.css";
 
 function MunicipalityFormView() {
   const { option, id } = useParams();
@@ -136,14 +139,7 @@ function MunicipalityFormView() {
     }
   }
   return (
-    <article
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "10px",
-      }}
-    >
+    <article className="form-container">
       <h2>{add ? "Skapa ny kommun" : "Uppdatera kommun"}</h2>
       <form
         onSubmit={
@@ -151,97 +147,39 @@ function MunicipalityFormView() {
             ? (e) => postMunicipality(e)
             : (e) => updateMunicipality(e, Number(id))
         }
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "80%",
-          gap: "5px",
-        }}
+        className="form-style"
       >
-        <section className="inputSection">
-          <label htmlFor="municipalityInput" className="labelForm">
-            Stad:
-          </label>
-          <input
-            id="municipalityInput"
-            type="text"
-            placeholder="Kommun"
-            value={municipality.municipalities_name}
-            required
-            onChange={(e) =>
-              setMunicipality({
-                municipalities_id: municipality.municipalities_id,
-                municipalities_name: e.target.value,
-                municipalities_population:
-                  municipality.municipalities_population,
-                region_id: municipality.region_id,
-              })
-            }
-            className="inputField"
-          />
-        </section>
-        <section className="inputSection">
-          <label htmlFor="populationInput" className="labelForm">
-            Befolning:
-          </label>
-          <input
-            id="populationInput"
-            type="number"
-            placeholder="0"
-            value={municipality.municipalities_population}
-            required
-            onChange={(e) =>
-              setMunicipality({
-                municipalities_id: municipality.municipalities_id,
-                municipalities_name: municipality.municipalities_name,
-                municipalities_population: e.target.value,
-                region_id: municipality.region_id,
-              })
-            }
-            className="inputField"
-          />
-        </section>
-        <section className="inputSection">
-          <label htmlFor="populationInput" className="labelForm">
-            Region:
-          </label>
-          <select
-            name=""
-            id=""
-            required
-            onChange={(e) =>
-              setMunicipality({
-                municipalities_id: municipality.municipalities_id,
-                municipalities_name: municipality.municipalities_name,
-                municipalities_population:
-                  municipality.municipalities_population,
-                region_id: Number(e.target.value),
-              })
-            }
-            className="inputField"
-            value={municipality.region_id || ""}
-          >
-            <option value="" disabled>
-              Välj
-            </option>
-            {regions &&
-              regions.map((region) => (
-                <option key={region.regions_id} value={region.regions_id}>
-                  {region.regions_name}
-                </option>
-              ))}
-          </select>
-        </section>
-        <input
-          type="submit"
-          value="Skicka"
-          style={{
-            width: "fit-content",
-            alignSelf: "end",
-            margin: "10px",
-            padding: "5px",
-          }}
+        <FormInput
+          id={String(municipality.municipalities_id)}
+          label="Kommun"
+          value={municipality.municipalities_name}
+          setValue={(e) =>
+            setMunicipality({ ...municipality, municipalities_name: e })
+          }
         />
+        <FormInput
+          id={String(municipality.municipalities_id)}
+          label="Befolkning"
+          value={municipality.municipalities_population}
+          setValue={(e) =>
+            setMunicipality({ ...municipality, municipalities_population: e })
+          }
+        />
+        <FormSelect
+          id={String(municipality.municipalities_id)}
+          label="Region"
+          value={municipality.region_id}
+          setValue={(e) => setMunicipality({ ...municipality, region_id: e })}
+          children={
+            regions &&
+            regions.map((region) => (
+              <option key={region.regions_id} value={region.regions_id}>
+                {region.regions_name}
+              </option>
+            ))
+          }
+        />
+        <input type="submit" value="Skicka" className="form-submit" />
       </form>
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
