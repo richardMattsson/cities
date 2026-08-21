@@ -34,9 +34,10 @@ function Router() {
       ],
       element: (
         <>
+          <h1 className="main-title">Sveriges geografi</h1>
           <Navbar />
           <hr style={{ margin: 0 }} />
-          <main className="App-main">
+          <main>
             <Outlet />
           </main>
         </>

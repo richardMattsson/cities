@@ -10,6 +10,9 @@
   .Navbar-nav {
     grid-template-columns: repeat(2, 1fr);
   }
+  .first-ul {
+    grid-column: span 2;
+  }
 }
 .Navbar-ul {
   display: flex;

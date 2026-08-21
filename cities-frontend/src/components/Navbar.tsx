@@ -18,7 +18,7 @@ function Navbar() {
 
   return (
     <nav className="Navbar-nav">
-      <ul className="Navbar-ul">
+      <ul className="Navbar-ul first-ul">
         <CustomLink to="/">Hem</CustomLink>
 
         {user ? (
