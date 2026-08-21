@@ -5,7 +5,7 @@ import CityFormView from "./views/CityFormView";
 import MunicipalityFormView from "./views/MunicipalityFormView";
 import RegionFormView from "./views/RegionFormView";
 import CityDetailView from "./views/CityDetailView";
-import MunicipalityDetailView from "./views/MunicipalityDetailsView";
+import MunicipalityDetailView from "./views/MunicipalityDetailView";
 import RegionDetailView from "./views/RegionDetailView";
 import SignUpView from "./views/SignUpView";
 import SignInView from "./views/SignInView";

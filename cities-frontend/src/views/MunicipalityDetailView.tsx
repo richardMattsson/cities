@@ -8,6 +8,9 @@ import {
   getOneMunicipalityAPI,
 } from "../api/municipalitiesAPI";
 import { getRegionsAPI } from "../api/regionsAPI";
+import "../css/DetailView.css";
+import DetailButtonSection from "../components/DetailButtonSection";
+import DetailInfoSection from "../components/DetailInfoSection";
 
 function MunicipalityDetailView() {
   const { id } = useParams();
@@ -24,7 +27,6 @@ function MunicipalityDetailView() {
   const region = regions?.find(
     (region) => region.regions_id === municipality.region_id,
   );
-  const regionId = region?.regions_id;
 
   useEffect(() => {
     let mounted = true;
@@ -123,50 +125,28 @@ function MunicipalityDetailView() {
   }
 
   return (
-    <article
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "10px",
-      }}
-    >
-      <section>
-        <h1>{municipality && "Kommun: " + municipality.municipalities_name}</h1>
+    <article className="detail-article">
+      <DetailInfoSection
+        title="Kommun"
+        name={municipality && municipality.municipalities_name}
+        population={municipality && municipality.municipalities_population}
+        label="Städer"
+        children={
+          cities &&
+          cities.map((city) => (
+            <Link key={city.cities_id} to={`/city/${city.cities_id}`}>
+              <li>{city.cities_name}</li>
+            </Link>
+          ))
+        }
+        region={region}
+      />
 
-        <h2>Städer:</h2>
-        <ul>
-          {cities &&
-            cities.map((city) => (
-              <li key={city.cities_id}>
-                <Link to={`/city/${city.cities_id}`}>{city.cities_name}</Link>
-              </li>
-            ))}
-        </ul>
-        <p>
-          {municipality &&
-            "Befolkning antal: " + municipality.municipalities_population}
-        </p>
-        <p>
-          <Link to={`/region/${regionId ?? ""}`}>
-            {region && "Region: " + region.regions_name}
-          </Link>
-        </p>
-      </section>
-      <section
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          width: "fit-content",
-          marginTop: "30px",
-        }}
-      >
-        <button>
-          <Link to={`/municipality-form/update/${id}`}>Uppdatera kommmun</Link>
-        </button>
-        <button onClick={deleteMunicipality}>Ta bort kommun</button>
-      </section>
+      <DetailButtonSection
+        to={`/municipality-form/update/${id}`}
+        onClick={deleteMunicipality}
+      />
+
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
     </article>

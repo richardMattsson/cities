@@ -4,6 +4,9 @@ import { deleteCityAPI, getOneCityAPI } from "../api/citiesAPI";
 import type { City, Municipality } from "../../../shared/types";
 import { getAuth } from "firebase/auth";
 import { getMunicipalitiesAPI } from "../api/municipalitiesAPI";
+import "../css/DetailView.css";
+import DetailButtonSection from "../components/DetailButtonSection";
+import DetailInfoSection from "../components/DetailInfoSection";
 
 function CityDetailView() {
   const { id } = useParams();
@@ -95,41 +98,27 @@ function CityDetailView() {
   }
 
   return (
-    <article
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "10px",
-      }}
-    >
-      <section>
-        <h1>{city && "Stad: " + city.cities_name}</h1>
-        <h2>Kommun:</h2>
-        <p>
+    <article className="detail-article">
+      <DetailInfoSection
+        title="Stad"
+        name={city && city.cities_name}
+        population={city && city.cities_population}
+        label="Kommun"
+        children={
           <Link to={`/municipality/${municipalityId ?? ""}`}>
-            {municipality && municipality.municipalities_name}
+            <li>{municipality && municipality.municipalities_name}</li>
           </Link>
-        </p>
-        <p>{city && "Befolkning antal: " + city.cities_population}</p>
-      </section>
-      <section
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          width: "fit-content",
-          marginTop: "30px",
-        }}
-      >
-        <button>
-          <Link to={`/city-form/update/${id}`}>Uppdatera stad</Link>
-        </button>
-        <button onClick={deleteCity}>Ta bort stad</button>
-      </section>
+        }
+      />
+
+      <DetailButtonSection
+        to={`/city-form/update/${id}`}
+        onClick={deleteCity}
+      />
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
     </article>
   );
 }
+
 export default CityDetailView;

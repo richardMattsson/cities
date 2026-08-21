@@ -7,6 +7,9 @@ import {
   getOneRegionAPI,
 } from "../api/regionsAPI";
 import { getAuth } from "firebase/auth";
+import "../css/DetailView.css";
+import DetailButtonSection from "../components/DetailButtonSection";
+import DetailInfoSection from "../components/DetailInfoSection";
 
 function RegionDetailView() {
   const { id } = useParams();
@@ -90,44 +93,34 @@ function RegionDetailView() {
   }
 
   return (
-    <article
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <section>
-        <h1>{region && "Region: " + region.regions_name}</h1>
-        <h2>Kommuner:</h2>
-        <ul>
-          {municipalities &&
-            municipalities.map((municipality) => (
-              <li key={municipality.municipalities_id}>
-                <Link to={`/municipality/${municipality.municipalities_id}`}>
-                  {municipality.municipalities_name}
-                </Link>
-              </li>
-            ))}
-        </ul>
-        <p>{region && "Befolkning antal: " + region.regions_population}</p>
-      </section>
-      <section
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          width: "fit-content",
-        }}
-      >
-        <button>
-          <Link to={`/region-form/update/${id}`}>Uppdatera region</Link>
-        </button>
-        <button onClick={deleteRegion}>Ta bort region</button>
-      </section>
+    <article className="detail-article">
+      <DetailInfoSection
+        title="Region"
+        name={region && region.regions_name}
+        population={region && String(region.regions_population)}
+        label="Kommuner"
+        children={
+          municipalities &&
+          municipalities.map((municipality) => (
+            <Link
+              key={municipality.municipalities_id}
+              to={`/municipality/${municipality.municipalities_id}`}
+            >
+              <li>{municipality.municipalities_name}</li>
+            </Link>
+          ))
+        }
+      />
+
+      <DetailButtonSection
+        to={`/region-form/update/${id}`}
+        onClick={deleteRegion}
+      />
+
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
     </article>
   );
 }
+
 export default RegionDetailView;
