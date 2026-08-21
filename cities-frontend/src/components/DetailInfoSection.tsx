@@ -24,9 +24,7 @@ export default function DetailInfoSection({
     <section>
       <h2 className="detail-title">{title}</h2>
       <h3 className="detail-title">{name}</h3>
-      <p className="detail-title">
-        {"Befolkning antal: " + population && population}
-      </p>
+      <p className="detail-title">{`Invånare: ${population}`}</p>
       <h4 className="detail-title">{label}:</h4>
       <ul className="detail-ul">{children}</ul>
       {region && (

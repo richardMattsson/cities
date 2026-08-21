@@ -42,6 +42,8 @@
     --border: #2e303a;
     --active: #333;
     --hover: #555;
+    --hover-update: #428a42;
+    --hover-delete: #aa3e3e;
     --code-bg: #1f2028;
     --accent: #c084fc;
     --accent-bg: rgba(192, 132, 252, 0.15);
