@@ -1,10 +1,10 @@
 :root {
-  --text: #6b6375;
+  --text: #4a484d;
   --text-h: #08060d;
-  --bg: #fffdfd;
-  --border: #88878b;
-  --active: #999;
-  --hover: #999;
+  --bg: #ffc444a4;
+  --border: #616163;
+  --active: #ffc444;
+  --hover: #ffc444ce;
   --hover-update: #82c782;
   --hover-delete: #f57777;
   --code-bg: #f4f3ec;
@@ -39,7 +39,7 @@
     --text: #9ca3af;
     --text-h: #f3f4f6;
     --bg: #16171d;
-    --border: #2e303a;
+    --border: #636469;
     --active: #333;
     --hover: #555;
     --hover-update: #428a42;
