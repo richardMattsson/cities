@@ -43,13 +43,13 @@
 
 .detail-action {
   box-sizing: border-box;
-  width: 150px;
+  width: 125px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  padding: 10px 20px;
+  padding: 5px 15px;
   border: 1px solid var(--accent-border);
   border-radius: 8px;
 
