@@ -66,8 +66,19 @@ function HomeView() {
   }, []);
   return (
     <article className="home-container">
-      <h1>Home</h1>
-      <p>
+      <h2 className="home-title">Home</h2>
+      <ul className="home-ul">
+        <Link to={"/cities"}>
+          <li>Antal Städer: {sumCities}</li>
+        </Link>
+        <Link to={"/municipalities"}>
+          <li>Antal Kommuner: {sumMunicipalities}</li>
+        </Link>
+        <Link to={"/regions"}>
+          <li>Antal Regioner: {sumRegions}</li>
+        </Link>
+      </ul>
+      {/* <p>
         Antal <Link to={"/cities"}>Städer:</Link> {sumCities}
       </p>
       <p>
@@ -75,7 +86,7 @@ function HomeView() {
       </p>
       <p>
         Antal <Link to={"/regions"}>Regioner:</Link> {sumRegions}
-      </p>
+      </p> */}
     </article>
   );
 }

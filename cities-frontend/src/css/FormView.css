@@ -8,8 +8,18 @@
 .form-style {
   display: flex;
   flex-direction: column;
-  width: 80%;
-  gap: 5px;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.inputSection {
+  display: flex;
+  gap: 2rem;
+}
+
+.labelForm,
+.inputField {
+  padding: 0.25rem;
 }
 
 .form-submit {
@@ -20,4 +30,5 @@
   align-self: flex-end;
   margin: 10px;
   padding: 5px;
+  cursor: pointer;
 }

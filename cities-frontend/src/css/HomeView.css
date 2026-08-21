@@ -4,3 +4,29 @@
   justify-content: center;
   align-items: center;
 }
+
+.home-title,
+.home-ul {
+  min-width: 200px;
+}
+
+.home-ul {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.home-ul a {
+  text-decoration-line: none;
+  color: inherit;
+  padding: 0.5rem;
+}
+
+.home-ul a:hover {
+  text-decoration-line: none;
+  color: var(--text-h);
+  background-color: var(--hover);
+}
