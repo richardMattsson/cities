@@ -152,6 +152,7 @@ function CityFormView() {
       <form
         onSubmit={add ? (e) => postCity(e) : (e) => updateCity(e, Number(id))}
         className="form-style"
+        data-cy="city-form"
       >
         <FormInput
           id={String(city.cities_id)}
@@ -184,7 +185,12 @@ function CityFormView() {
             ))
           }
         />
-        <input type="submit" value="Skicka" className="form-submit" />
+        <input
+          type="submit"
+          value="Skicka"
+          className="form-submit"
+          data-cy="submit-city-form"
+        />
       </form>
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}

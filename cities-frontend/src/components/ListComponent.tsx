@@ -26,7 +26,11 @@ function ListComponent({ cities, municipalities, regions }: ItemsListProps) {
         <ul className="list-ul">
           {cities &&
             cities.map((city) => (
-              <Link key={city.cities_id} to={`/detail/city/${city.cities_id}`}>
+              <Link
+                key={city.cities_id}
+                to={`/detail/city/${city.cities_id}`}
+                data-cy="city-list-item"
+              >
                 <li>{city.cities_name}</li>
               </Link>
             ))}

@@ -21,6 +21,7 @@ export default function FormSelect({
       <select
         name=""
         id={id}
+        data-cy={`select-${label.toLowerCase()}`}
         required
         onChange={(e) => setValue(Number(e.target.value))}
         className="inputField"

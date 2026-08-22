@@ -19,6 +19,7 @@ export default function FormInput({
 
       <input
         id={id}
+        data-cy={`input-${label.toLowerCase()}`}
         type="text"
         placeholder={label}
         value={value}

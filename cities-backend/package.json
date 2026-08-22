@@ -8,7 +8,11 @@
     "seed": "tsx drizzle/seed.ts",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx drizzle/seed.ts",
+    "db:push:e2e": "node --env-file=../.env.e2e ./node_modules/drizzle-kit/bin.cjs push",
+    "db:seed:e2e": "tsx --env-file=../.env.e2e drizzle/seed.ts",
     "build": "tsc --outDir dist",
+    "dev": "tsx watch src/index.ts",
+    "start:e2e": "tsx --env-file=../.env.e2e src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

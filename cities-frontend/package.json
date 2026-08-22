@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:e2e": "vite --mode e2e",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "e2e:run": "start-server-and-test dev:e2e http://localhost:5173 cy:run"
   },
   "dependencies": {
     "@firebase-oss/ui-react": "^7.0.3",
@@ -27,6 +31,8 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "cypress": "^15.11.0",
+    "start-server-and-test": "^2.1.2",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.65.0",
     "vite": "^8.2.0"
