@@ -78,15 +78,6 @@ function HomeView() {
           <li>Antal Regioner: {sumRegions}</li>
         </Link>
       </ul>
-      {/* <p>
-        Antal <Link to={"/cities"}>Städer:</Link> {sumCities}
-      </p>
-      <p>
-        Antal <Link to={"/municipalities"}>Kommuner:</Link> {sumMunicipalities}
-      </p>
-      <p>
-        Antal <Link to={"/regions"}>Regioner:</Link> {sumRegions}
-      </p> */}
     </article>
   );
 }

@@ -7,9 +7,9 @@ import { getRegionsAPI } from "../api/regionsAPI";
 import { getMunicipalitiesAPI } from "../api/municipalitiesAPI";
 
 export default function ListView() {
-  const { options } = useParams();
+  const { type } = useParams();
 
-  switch (options) {
+  switch (type) {
     case "cities":
       return <CitiesView />;
     case "municipalities":

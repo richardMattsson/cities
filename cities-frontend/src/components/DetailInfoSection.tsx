@@ -31,7 +31,7 @@ export default function DetailInfoSection({
         <>
           <h4 className="detail-title">Region:</h4>
           <ul className="detail-ul">
-            <Link to={`/region/${regionId ?? ""}`}>
+            <Link to={`/detail/region/${regionId ?? ""}`}>
               <li>{region && region.regions_name}</li>
             </Link>
           </ul>

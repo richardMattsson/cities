@@ -47,9 +47,9 @@ function Navbar() {
         <CustomLink to="/cities">Visa Städer</CustomLink>
       </ul>
       <ul className="Navbar-ul">
-        <CustomLink to="/region-form/add">Skapa ny region</CustomLink>
-        <CustomLink to="/city-form/add">Skapa ny stad</CustomLink>
-        <CustomLink to="/municipality-form/add">Skapa ny kommun</CustomLink>
+        <CustomLink to="/form/region/add">Skapa ny region</CustomLink>
+        <CustomLink to="/form/municipality/add">Skapa ny kommun</CustomLink>
+        <CustomLink to="/form/city/add">Skapa ny stad</CustomLink>
       </ul>
     </nav>
   );

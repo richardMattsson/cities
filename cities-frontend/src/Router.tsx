@@ -1,34 +1,20 @@
 import { createHashRouter, Outlet, RouterProvider } from "react-router-dom";
 import HomeView from "./views/HomeView";
 import ListView from "./views/ListView";
-import CityFormView from "./views/CityFormView";
-import MunicipalityFormView from "./views/MunicipalityFormView";
-import RegionFormView from "./views/RegionFormView";
-import CityDetailView from "./views/CityDetailView";
-import MunicipalityDetailView from "./views/MunicipalityDetailView";
-import RegionDetailView from "./views/RegionDetailView";
 import SignUpView from "./views/SignUpView";
 import SignInView from "./views/SignInView";
 import Navbar from "./components/Navbar";
+import DetailView from "./views/DetailView";
+import FormView from "./views/FormView";
 
 function Router() {
   const router = createHashRouter([
     {
       children: [
         { element: <HomeView />, path: "/" },
-        { element: <ListView />, path: "/:options" },
-        {
-          element: <CityFormView />,
-          path: "/city-form/:option/:id?",
-        },
-        {
-          element: <MunicipalityFormView />,
-          path: "/municipality-form/:option/:id?",
-        },
-        { element: <RegionFormView />, path: "/region-form/:option/:id?" },
-        { element: <CityDetailView />, path: "/city/:id" },
-        { element: <MunicipalityDetailView />, path: "/municipality/:id" },
-        { element: <RegionDetailView />, path: "/region/:id" },
+        { element: <ListView />, path: "/:type" },
+        { element: <DetailView />, path: "/detail/:type/:id" },
+        { element: <FormView />, path: "/form/:type/:option/:id?" },
         { element: <SignUpView />, path: "/signUp" },
         { element: <SignInView />, path: "/signIn" },
       ],
