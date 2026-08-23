@@ -33,7 +33,7 @@ Set-Location cities-backend
 npm run start:e2e
 ```
 
-Run the suite in another terminal. This starts Vite in E2E mode and waits for it:
+Run the suite in another terminal. This starts Vite in E2E mode, waits for it, and stops it again when Cypress finishes:
 
 ```powershell
 Set-Location cities-frontend

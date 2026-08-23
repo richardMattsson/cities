@@ -9,18 +9,19 @@ type FirebaseCypressConfig = {
   firebaseTestPassword: string;
 };
 
-function getRequiredConfig(): FirebaseCypressConfig {
-  const keys = ["firebaseApiKey", "firebaseAuthDomain", "firebaseProjectId", "firebaseTestEmail", "firebaseTestPassword"] as const;
-  const config = Object.fromEntries(keys.map((key) => [key, Cypress.env(key)])) as Partial<FirebaseCypressConfig>;
-  const missing = keys.filter((key) => !config[key]);
-  if (missing.length) {
-    throw new Error(`Missing Cypress Firebase configuration: ${missing.join(", ")}. Copy cypress.env.example.json to cypress.env.json or set CYPRESS_* variables.`);
-  }
-  return config as FirebaseCypressConfig;
+function getRequiredConfig(): Cypress.Chainable<FirebaseCypressConfig> {
+  const keys: Array<keyof FirebaseCypressConfig> = ["firebaseApiKey", "firebaseAuthDomain", "firebaseProjectId", "firebaseTestEmail", "firebaseTestPassword"];
+  return cy.env(keys).then((config) => {
+    const typedConfig = config as Partial<FirebaseCypressConfig>;
+    const missing = keys.filter((key) => !typedConfig[key]);
+    if (missing.length) {
+      throw new Error(`Missing Cypress Firebase configuration: ${missing.join(", ")}. Copy cypress.env.example.json to cypress.env.json or set CYPRESS_* variables.`);
+    }
+    return typedConfig as FirebaseCypressConfig;
+  });
 }
 
-function getTestAuth() {
-  const config = getRequiredConfig();
+function getTestAuth(config: FirebaseCypressConfig) {
   const app = getApps().length ? getApp() : initializeApp({
     apiKey: config.firebaseApiKey,
     authDomain: config.firebaseAuthDomain,
@@ -29,16 +30,16 @@ function getTestAuth() {
   return { auth: getAuth(app), config };
 }
 
-Cypress.Commands.add("loginByFirebase", () => {
-  cy.then(() => {
-    const { auth, config } = getTestAuth();
-    return signInWithEmailAndPassword(auth, config.firebaseTestEmail, config.firebaseTestPassword);
+Cypress.Commands.add("loginByFirebase", (): Cypress.Chainable<void> => {
+  return getRequiredConfig().then((config) => {
+    const { auth } = getTestAuth(config);
+    return signInWithEmailAndPassword(auth, config.firebaseTestEmail, config.firebaseTestPassword).then(() => {});
   });
 });
 
 Cypress.Commands.add("getFirebaseIdToken", () => {
-  return cy.then(() => {
-    const { auth } = getTestAuth();
+  return getRequiredConfig().then((config) => {
+    const { auth } = getTestAuth(config);
     if (!auth.currentUser) throw new Error("No Firebase user is signed in.");
     return auth.currentUser.getIdToken();
   });
