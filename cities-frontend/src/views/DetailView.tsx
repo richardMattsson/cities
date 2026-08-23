@@ -123,13 +123,13 @@ function CityDetailView({ id }: { id: number }) {
           </Link>
         }
       />
+      {errorMsg && <p>{errorMsg}</p>}
+      {succesMsg && <p>{succesMsg}</p>}
 
       <DetailButtonSection
         to={`/form/city/update/${id}`}
         onClick={deleteCity}
       />
-      {errorMsg && <p>{errorMsg}</p>}
-      {succesMsg && <p>{succesMsg}</p>}
     </article>
   );
 }
@@ -252,14 +252,12 @@ function MunicipalityDetailView({ id }: { id: number }) {
         }
         region={region}
       />
-
+      {errorMsg && <p>{errorMsg}</p>}
+      {succesMsg && <p>{succesMsg}</p>}
       <DetailButtonSection
         to={`/form/municipality/update/${id}`}
         onClick={deleteMunicipality}
       />
-
-      {errorMsg && <p>{errorMsg}</p>}
-      {succesMsg && <p>{succesMsg}</p>}
     </article>
   );
 }
@@ -352,13 +350,13 @@ function RegionDetailView({ id }: { id: number }) {
         }
       />
 
+      {errorMsg && <p>{errorMsg}</p>}
+      {succesMsg && <p>{succesMsg}</p>}
+
       <DetailButtonSection
         to={`/form/region/update/${id}`}
         onClick={deleteRegion}
       />
-
-      {errorMsg && <p>{errorMsg}</p>}
-      {succesMsg && <p>{succesMsg}</p>}
     </article>
   );
 }

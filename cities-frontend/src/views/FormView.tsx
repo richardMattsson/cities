@@ -34,8 +34,10 @@ function CityFormView() {
     municipality_id: 0,
   });
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
+
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
+  const [loading, setLoading] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -94,6 +96,8 @@ function CityFormView() {
       municipality_id: city.municipality_id,
     };
 
+    setLoading("Laddar...");
+
     try {
       const token = await getAuth().currentUser?.getIdToken();
 
@@ -103,6 +107,9 @@ function CityFormView() {
       }
       const response = await citiyApi.postCityAPI(body, token);
       const result = await response.json();
+
+      setLoading("");
+
       if (!response.ok) {
         setErrorMsg(result.error);
         return;
@@ -110,6 +117,7 @@ function CityFormView() {
 
       setSuccesMsg("Du har skapat en ny stad!");
     } catch {
+      setLoading("");
       setErrorMsg("Något gick fel.");
       return;
     }
@@ -126,6 +134,8 @@ function CityFormView() {
       municipality_id: city.municipality_id,
     };
 
+    setLoading("Laddar...");
+
     try {
       const token = await getAuth().currentUser?.getIdToken();
 
@@ -136,6 +146,8 @@ function CityFormView() {
 
       const response = await citiyApi.updateCityAPI(body, id, token);
 
+      setLoading("");
+
       if (!response.ok) {
         console.log("error fetching resource");
         return;
@@ -143,6 +155,7 @@ function CityFormView() {
 
       setSuccesMsg("Du har uppdaterat en stad");
     } catch (error) {
+      setLoading("");
       setErrorMsg("Något gick fel.");
       console.log(error);
     }
@@ -187,6 +200,9 @@ function CityFormView() {
             ))
           }
         />
+        {loading && loading}
+        {errorMsg && <p>{errorMsg}</p>}
+        {succesMsg && <p>{succesMsg}</p>}
         <input
           type="submit"
           value="Skicka"
@@ -194,8 +210,6 @@ function CityFormView() {
           data-cy="submit-form"
         />
       </form>
-      {errorMsg && <p>{errorMsg}</p>}
-      {succesMsg && <p>{succesMsg}</p>}
     </article>
   );
 }
@@ -210,8 +224,10 @@ function MunicipalityFormView() {
     region_id: 0,
   });
   const [regions, setRegions] = useState<Region[]>([]);
+
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
+  const [loading, setLoading] = useState("");
 
   useEffect(() => {
     let mounted = true;
@@ -266,11 +282,14 @@ function MunicipalityFormView() {
     e.preventDefault();
     setErrorMsg("");
     setSuccesMsg("");
+
     const body: Omit<Municipality, "municipalities_id"> = {
       municipalities_name: municipality.municipalities_name,
       municipalities_population: municipality.municipalities_population,
       region_id: municipality.region_id,
     };
+
+    setLoading("Laddar...");
 
     try {
       const token = await getAuth().currentUser?.getIdToken();
@@ -281,6 +300,9 @@ function MunicipalityFormView() {
       }
       const response = await municipalityApi.postMunicipalityAPI(body, token);
       const result = await response.json();
+
+      setLoading("");
+
       if (!response.ok) {
         setErrorMsg(result.error);
         return;
@@ -288,6 +310,7 @@ function MunicipalityFormView() {
 
       setSuccesMsg("Du har skapat en ny kommun!");
     } catch {
+      setLoading("");
       setErrorMsg("Något gick fel.");
       return;
     }
@@ -305,6 +328,8 @@ function MunicipalityFormView() {
       region_id: municipality.region_id,
     };
 
+    setLoading("Laddar...");
+
     try {
       const token = await getAuth().currentUser?.getIdToken();
 
@@ -320,6 +345,8 @@ function MunicipalityFormView() {
       );
       const result = await response.json();
 
+      setLoading("");
+
       if (!response.ok) {
         setErrorMsg(result.error);
         return;
@@ -327,6 +354,7 @@ function MunicipalityFormView() {
 
       setSuccesMsg("Du har uppdaterat en kommun");
     } catch (error) {
+      setLoading("");
       setErrorMsg("Något gick fel.");
       console.log(error);
     }
@@ -374,6 +402,9 @@ function MunicipalityFormView() {
             ))
           }
         />
+        {loading && loading}
+        {errorMsg && <p>{errorMsg}</p>}
+        {succesMsg && <p>{succesMsg}</p>}
         <input
           type="submit"
           value="Skicka"
@@ -381,8 +412,6 @@ function MunicipalityFormView() {
           data-cy="submit-form"
         />
       </form>
-      {errorMsg && <p>{errorMsg}</p>}
-      {succesMsg && <p>{succesMsg}</p>}
     </article>
   );
 }
@@ -397,6 +426,7 @@ function RegionFormView() {
   });
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
+  const [loading, setLoading] = useState("");
 
   useEffect(() => {
     if (add) {
@@ -430,6 +460,8 @@ function RegionFormView() {
       regions_population: region.regions_population,
     };
 
+    setLoading("Laddar...");
+
     try {
       const token = await getAuth().currentUser?.getIdToken();
 
@@ -438,11 +470,17 @@ function RegionFormView() {
         return;
       }
       const response = await regionApi.postRegionAPI(body, token);
+
+      setLoading("");
+
       if (!response.ok) {
         console.log("error fetching resource");
+        return;
       }
+
       setSuccesMsg("Du har skapat en ny region!");
     } catch {
+      setLoading("");
       setErrorMsg("Något gick fel.");
       return;
     }
@@ -459,6 +497,8 @@ function RegionFormView() {
       regions_population: region.regions_population,
     };
 
+    setLoading("Laddar...");
+
     try {
       const token = await getAuth().currentUser?.getIdToken();
 
@@ -468,12 +508,14 @@ function RegionFormView() {
       }
       const response = await regionApi.updateRegionAPI(body, id, token);
 
+      setLoading("");
       if (!response.ok) {
         console.log("error fetching resource");
       }
 
       setSuccesMsg("Du har uppdaterat en region");
     } catch (error) {
+      setLoading("");
       setErrorMsg("Något gick fel.");
       console.log(error);
     }
@@ -501,6 +543,9 @@ function RegionFormView() {
           value={region.regions_population}
           setValue={(e) => setRegion({ ...region, regions_population: e })}
         />
+        {loading && loading}
+        {errorMsg && <p>{errorMsg}</p>}
+        {succesMsg && <p>{succesMsg}</p>}
         <input
           type="submit"
           value="Skicka"
@@ -508,8 +553,6 @@ function RegionFormView() {
           data-cy="submit-form"
         />
       </form>
-      {errorMsg && <p>{errorMsg}</p>}
-      {succesMsg && <p>{succesMsg}</p>}
     </article>
   );
 }
