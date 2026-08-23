@@ -8,18 +8,18 @@ Use a dedicated Firebase test project and a separate Postgres database. Never po
 
 Create the ignored local files from the templates:
 
-```powershell
-Copy-Item .env.e2e.example .env.e2e
-Copy-Item cities-frontend/.env.e2e.example cities-frontend/.env.e2e
-Copy-Item cities-frontend/cypress.env.example.json cities-frontend/cypress.env.json
+```bash
+cp .env.e2e.example .env.e2e
+cp cities-frontend/.env.e2e.example cities-frontend/.env.e2e
+cp cities-frontend/cypress.env.example.json cities-frontend/cypress.env.json
 ```
 
 Create one dedicated email/password user in the Firebase test project and place those credentials only in `cities-frontend/cypress.env.json`. The values can instead be supplied as `CYPRESS_FIREBASE_API_KEY`, `CYPRESS_FIREBASE_AUTH_DOMAIN`, `CYPRESS_FIREBASE_PROJECT_ID`, `CYPRESS_FIREBASE_TEST_EMAIL`, and `CYPRESS_FIREBASE_TEST_PASSWORD`.
 
 The backend service-account JSON must belong to the same Firebase test project. Initialise the empty `cities_e2e` database with the existing schema and seed it before testing; the city form needs at least one municipality:
 
-```powershell
-Set-Location cities-backend
+```bash
+cd cities-backend
 npm run db:push:e2e
 npm run db:seed:e2e
 ```
@@ -28,15 +28,15 @@ npm run db:seed:e2e
 
 Start the isolated API in one terminal:
 
-```powershell
-Set-Location cities-backend
+```bash
+cd cities-backend
 npm run start:e2e
 ```
 
 Run the suite in another terminal. This starts Vite in E2E mode, waits for it, and stops it again when Cypress finishes:
 
-```powershell
-Set-Location cities-frontend
+```bash
+cd cities-frontend
 npm run e2e:run
 ```
 
