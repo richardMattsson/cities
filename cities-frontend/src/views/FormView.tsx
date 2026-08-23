@@ -7,6 +7,7 @@ import * as regionApi from "../api/regionsAPI";
 import { getAuth } from "firebase/auth";
 import FormInput from "../components/FormInput";
 import FormSelect from "../components/FormSelect";
+import "../css/FormView.css";
 
 export default function FormView() {
   const { type } = useParams();

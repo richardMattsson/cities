@@ -17,6 +17,7 @@ import {
   getOneRegionAPI,
   getRegionsAPI,
 } from "../api/regionsAPI";
+import "../css/DetailView.css";
 
 export default function DetailView() {
   const { type, id } = useParams();
