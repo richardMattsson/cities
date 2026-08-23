@@ -5,6 +5,16 @@
   padding: 10px;
 }
 
+.form-style,
+.form-title {
+  min-width: 350px;
+}
+
+.form-title {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
 .form-style {
   display: flex;
   flex-direction: column;

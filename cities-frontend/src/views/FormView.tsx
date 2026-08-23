@@ -8,6 +8,7 @@ import { getAuth } from "firebase/auth";
 import FormInput from "../components/FormInput";
 import FormSelect from "../components/FormSelect";
 import "../css/FormView.css";
+import { truncateText } from "../utils/helper";
 
 export default function FormView() {
   const { type } = useParams();
@@ -149,7 +150,7 @@ function CityFormView() {
 
   return (
     <article className="form-container">
-      <h2>{add ? "Skapa ny stad" : "Uppdatera stad"}</h2>
+      <h2 className="form-title">{add ? "Skapa ny stad" : "Uppdatera stad"}</h2>
       <form
         onSubmit={add ? (e) => postCity(e) : (e) => updateCity(e, Number(id))}
         className="form-style"
@@ -181,7 +182,7 @@ function CityFormView() {
                 key={municipality.municipalities_id}
                 value={municipality.municipalities_id}
               >
-                {municipality.municipalities_name}
+                {truncateText(municipality.municipalities_name, 20)}
               </option>
             ))
           }
@@ -190,7 +191,7 @@ function CityFormView() {
           type="submit"
           value="Skicka"
           className="form-submit"
-          data-cy="submit-city-form"
+          data-cy="submit-form"
         />
       </form>
       {errorMsg && <p>{errorMsg}</p>}
@@ -332,7 +333,9 @@ function MunicipalityFormView() {
   }
   return (
     <article className="form-container">
-      <h2>{add ? "Skapa ny kommun" : "Uppdatera kommun"}</h2>
+      <h2 className="form-title">
+        {add ? "Skapa ny kommun" : "Uppdatera kommun"}
+      </h2>
       <form
         onSubmit={
           add
@@ -366,12 +369,17 @@ function MunicipalityFormView() {
             regions &&
             regions.map((region) => (
               <option key={region.regions_id} value={region.regions_id}>
-                {region.regions_name}
+                {truncateText(region.regions_name, 20)}
               </option>
             ))
           }
         />
-        <input type="submit" value="Skicka" className="form-submit" />
+        <input
+          type="submit"
+          value="Skicka"
+          className="form-submit"
+          data-cy="submit-form"
+        />
       </form>
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
@@ -472,7 +480,9 @@ function RegionFormView() {
   }
   return (
     <article className="form-container">
-      <h2>{add ? "Skapa ny region" : "Uppdatera region"}</h2>
+      <h2 className="form-title">
+        {add ? "Skapa ny region" : "Uppdatera region"}
+      </h2>
       <form
         onSubmit={
           add ? (e) => postRegion(e) : (e) => updateRegion(e, Number(id))
@@ -491,7 +501,12 @@ function RegionFormView() {
           value={region.regions_population}
           setValue={(e) => setRegion({ ...region, regions_population: e })}
         />
-        <input type="submit" value="Skicka" className="form-submit" />
+        <input
+          type="submit"
+          value="Skicka"
+          className="form-submit"
+          data-cy="submit-form"
+        />
       </form>
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}

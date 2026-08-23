@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import type { City, Municipality, Region } from "../../../shared/types";
 import "../css/ListComponent.css";
+import { truncateText } from "../utils/helper";
 
 type ItemsListProps = {
   cities?: City[];
@@ -26,13 +27,12 @@ function ListComponent({ cities, municipalities, regions }: ItemsListProps) {
         <ul className="list-ul">
           {cities &&
             cities.map((city) => (
-              <Link
+              <CustomLinkComponent
                 key={city.cities_id}
                 to={`/detail/city/${city.cities_id}`}
-                data-cy="city-list-item"
               >
-                <li>{city.cities_name}</li>
-              </Link>
+                {truncateText(city.cities_name, 20)}
+              </CustomLinkComponent>
             ))}
         </ul>
       )}
@@ -40,12 +40,12 @@ function ListComponent({ cities, municipalities, regions }: ItemsListProps) {
         <ul className="list-ul">
           {municipalities &&
             municipalities.map((municipality) => (
-              <Link
+              <CustomLinkComponent
                 key={municipality.municipalities_id}
                 to={`/detail/municipality/${municipality.municipalities_id}`}
               >
-                <li>{municipality.municipalities_name}</li>
-              </Link>
+                {truncateText(municipality.municipalities_name, 20)}
+              </CustomLinkComponent>
             ))}
         </ul>
       )}
@@ -53,16 +53,30 @@ function ListComponent({ cities, municipalities, regions }: ItemsListProps) {
         <ul className="list-ul">
           {regions &&
             regions.map((region) => (
-              <Link
+              <CustomLinkComponent
                 key={region.regions_id}
                 to={`/detail/region/${region.regions_id}`}
               >
-                <li> {region.regions_name}</li>
-              </Link>
+                {truncateText(region.regions_name, 20)}
+              </CustomLinkComponent>
             ))}
         </ul>
       )}
     </article>
+  );
+}
+
+type CustomLinkComponentProps = {
+  key: number;
+  to: string;
+  children: React.ReactNode;
+};
+
+function CustomLinkComponent({ key, to, children }: CustomLinkComponentProps) {
+  return (
+    <Link key={key} to={to}>
+      <li data-cy="list-item">{children} </li>
+    </Link>
   );
 }
 
