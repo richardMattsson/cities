@@ -5,6 +5,7 @@ import { startTransition, useEffect, useState } from "react";
 import { getCitiesAPI } from "../api/citiesAPI";
 import { getRegionsAPI } from "../api/regionsAPI";
 import { getMunicipalitiesAPI } from "../api/municipalitiesAPI";
+import "../css/ListView.css";
 
 export default function ListView() {
   const { type } = useParams();
@@ -22,6 +23,11 @@ export default function ListView() {
 
 function CitiesView() {
   const [cities, setCities] = useState<City[]>([]);
+  const [input, setInput] = useState("");
+
+  const filteredCities = cities.filter((city) =>
+    city.cities_name.toLowerCase().includes(input.toLowerCase()),
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -44,11 +50,32 @@ function CitiesView() {
       mounted = false;
     };
   }, []);
-  return <ListComponent cities={cities} />;
+
+  return (
+    <article className="list-container">
+      <h2>{`${cities.length} Städer`}</h2>
+      <input
+        autoFocus
+        type="text"
+        placeholder="Sök..."
+        data-cy="list-search"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+      />
+      <ListComponent cities={filteredCities ? filteredCities : cities} />
+    </article>
+  );
 }
 
 function MunicipalitiesView() {
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
+  const [input, setInput] = useState("");
+
+  const filteredMunicipalities = municipalities.filter((municipality) =>
+    municipality.municipalities_name
+      .toLowerCase()
+      .includes(input.toLowerCase()),
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -71,11 +98,33 @@ function MunicipalitiesView() {
       mounted = false;
     };
   }, []);
-  return <ListComponent municipalities={municipalities} />;
+  return (
+    <article className="list-container">
+      <h2>{`${municipalities.length} Kommuner`}</h2>
+      <input
+        autoFocus
+        type="text"
+        placeholder="Sök..."
+        data-cy="list-search"
+        onChange={(e) => setInput(e.target.value)}
+      />
+      <ListComponent
+        municipalities={
+          filteredMunicipalities ? filteredMunicipalities : municipalities
+        }
+      />
+    </article>
+  );
 }
 
 function RegionsView() {
   const [regions, setRegions] = useState<Region[]>([]);
+  const [input, setInput] = useState("");
+
+  const filteredRegions = regions.filter((region) =>
+    region.regions_name.toLowerCase().includes(input.toLowerCase()),
+  );
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -97,5 +146,18 @@ function RegionsView() {
       mounted = false;
     };
   }, []);
-  return <ListComponent regions={regions} />;
+
+  return (
+    <article className="list-container">
+      <h2>{`${regions.length} Regioner`}</h2>
+      <input
+        autoFocus
+        type="text"
+        placeholder="Sök..."
+        data-cy="list-search"
+        onChange={(e) => setInput(e.target.value)}
+      />
+      <ListComponent regions={filteredRegions ? filteredRegions : regions} />
+    </article>
+  );
 }
