@@ -67,8 +67,9 @@ web_modules/
 
 # dotenv environment variable files
 .env
-.env.*
-!.env.example
+.env.e2e
+.env.docker
+cities-frontend/cypress.env.json
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

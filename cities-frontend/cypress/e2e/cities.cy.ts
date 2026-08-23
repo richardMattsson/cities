@@ -1,0 +1,96 @@
+describe("cities", () => {
+  let createdCityId: number | undefined;
+
+  const cityName = (suffix: string) =>
+    `Cypress teststad ${suffix} ${Date.now()}-${Cypress._.random(100000)}`;
+
+  beforeEach(() => cy.loginByFirebase());
+
+  afterEach(() => {
+    if (!createdCityId) return;
+    cy.getFirebaseIdToken().then((token) => {
+      cy.request({
+        method: "DELETE",
+        url: `/api/cities/${createdCityId}`,
+        headers: { Authorization: `Bearer ${token}` },
+        failOnStatusCode: false,
+      }).its("status").should("be.oneOf", [200, 404]);
+    });
+  });
+
+  function createCityThroughUi(name: string, population: string) {
+    cy.intercept("POST", "/api/cities").as("createCity");
+    cy.intercept("GET", "/api/municipalities").as("getMunicipalities");
+    cy.visit("/#/form/city/add");
+    cy.wait("@getMunicipalities");
+    cy.get('[data-cy="input-stad"]').type(name);
+    cy.get('[data-cy="input-befolkning"]').type(population);
+    cy.get('[data-cy="select-kommun"] option:not([disabled])').first().invoke("val").then((municipalityId) => {
+      cy.get('[data-cy="select-kommun"]').select(String(municipalityId));
+    });
+    cy.get('[data-cy="submit-city-form"]').click();
+    return cy.wait("@createCity").then(({ request, response }) => {
+      expect(response?.statusCode).to.eq(201);
+      expect(request.headers.authorization).to.match(/^Bearer .+/);
+      expect(response?.body[0]).to.include({ cities_name: name, cities_population: Number(population) });
+      createdCityId = response?.body[0].cities_id;
+      expect(createdCityId, "created city id").to.be.a("number");
+      return createdCityId!;
+    });
+  }
+
+  it("should allow an authenticated user to create a city", () => {
+    const name = cityName("create");
+    createCityThroughUi(name, "12345");
+    cy.intercept("GET", "/api/cities").as("getCities");
+    cy.visit("/#/cities");
+    cy.wait("@getCities").its("response.statusCode").should("eq", 200);
+    cy.get('[data-cy="city-list-item"]').contains(name).should("be.visible");
+  });
+
+  it("should allow an authenticated user to update a city", () => {
+    const originalName = cityName("update-original");
+    const updatedName = cityName("update-complete");
+    createCityThroughUi(originalName, "12345").then((cityId) => {
+      cy.intercept("GET", `/api/cities/${cityId}`).as("getCity");
+      cy.intercept("PUT", `/api/cities/${cityId}`).as("updateCity");
+      cy.visit(`/#/form/city/update/${cityId}`);
+      cy.wait("@getCity");
+      cy.get('[data-cy="input-stad"]').clear().type(updatedName);
+      cy.get('[data-cy="input-befolkning"]').clear().type("54321");
+      cy.get('[data-cy="submit-city-form"]').click();
+      cy.wait("@updateCity").then(({ request, response }) => {
+        expect(response?.statusCode).to.eq(200);
+        expect(request.headers.authorization).to.match(/^Bearer .+/);
+        expect(response?.body[0]).to.include({ cities_id: cityId, cities_name: updatedName, cities_population: 54321 });
+      });
+      cy.contains("Du har uppdaterat en stad").should("be.visible");
+      cy.intercept("GET", `/api/cities/${cityId}`).as("getUpdatedCity");
+      cy.visit(`/#/detail/city/${cityId}`);
+      cy.wait("@getUpdatedCity").its("response.body.0").should("include", { cities_id: cityId, cities_name: updatedName, cities_population: 54321 });
+      cy.contains(updatedName).should("be.visible");
+    });
+  });
+
+  it("should allow an authenticated user to delete a city", () => {
+    const name = cityName("delete");
+    createCityThroughUi(name, "12345").then((cityId) => {
+      cy.intercept("GET", `/api/cities/${cityId}`).as("getCity");
+      cy.intercept("DELETE", `/api/cities/${cityId}`).as("deleteCity");
+      cy.visit(`/#/detail/city/${cityId}`);
+      cy.wait("@getCity");
+      cy.on("window:confirm", () => true);
+      cy.get('[data-cy="delete-item"]').click();
+      cy.wait("@deleteCity").then(({ request, response }) => {
+        expect(response?.statusCode).to.eq(200);
+        expect(request.headers.authorization).to.match(/^Bearer .+/);
+        expect(response?.body[0].cities_id).to.eq(cityId);
+      });
+      createdCityId = undefined;
+      cy.contains("Du har tagit bort en stad").should("be.visible");
+      cy.request(`/api/cities/${cityId}`).its("body").should("deep.equal", []);
+      cy.visit("/#/cities");
+      cy.contains('[data-cy="city-list-item"]', name).should("not.exist");
+    });
+  });
+});
