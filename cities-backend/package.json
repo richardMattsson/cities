@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "type": "module",
+  "engines": {
+    "node": "20.19.0"
+  },
   "scripts": {
     "seed": "tsx drizzle/seed.ts",
     "db:push": "drizzle-kit push",
