@@ -13,7 +13,7 @@
     "build": "tsc --outDir dist",
     "dev": "tsx watch src/index.ts",
     "start:e2e": "tsx --env-file=../.env.e2e src/index.ts",
-    "test": "node --import tsx --test tests/authMiddleware.test.ts"
+    "test": "node --import tsx --test"
   },
   "keywords": [],
   "author": "",

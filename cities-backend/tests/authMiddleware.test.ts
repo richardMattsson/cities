@@ -1,7 +1,9 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { authenticateToken } from "../src/middleware/authMiddleware.ts";
-import { Response } from "express";
+import type { Response } from "express";
+
+type ResponseType = Response<any, Record<string, any>>;
 
 describe("authenticateToken", () => {
   it("rejects a request that is missing a bearer token", async () => {
@@ -22,7 +24,7 @@ describe("authenticateToken", () => {
           },
         };
       },
-    } as Response<any, Record<string, any>>;
+    } as ResponseType;
 
     await authenticateToken(req, res, () => {
       nextCalled = true;
@@ -41,7 +43,7 @@ describe("authenticateToken", () => {
     let nextCalled = false;
 
     const req = {
-      headers: { Authorization: "Bearer: 0000" },
+      headers: { authorization: "Bearer: " },
     } as any;
 
     const res = {
@@ -53,7 +55,7 @@ describe("authenticateToken", () => {
           },
         };
       },
-    } as Response<any, Record<string, any>>;
+    } as ResponseType;
 
     await authenticateToken(req, res, () => {
       nextCalled = true;
@@ -72,7 +74,7 @@ describe("authenticateToken", () => {
     let nextCalled = false;
 
     const req = {
-      headers: { Authorization: "Bearer: " },
+      headers: { authorization: "Bearer: eyJhbGciOiJSUzI1NiI" },
     } as any;
 
     const res = {
@@ -84,7 +86,7 @@ describe("authenticateToken", () => {
           },
         };
       },
-    } as Response<any, Record<string, any>>;
+    } as ResponseType;
 
     await authenticateToken(req, res, () => {
       nextCalled = true;
