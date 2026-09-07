@@ -30,7 +30,7 @@ describe("authenticateToken", () => {
     assert.equal(nextCalled, false);
     assert.equal(statusCode, 401);
     assert.deepEqual(responseBody, {
-      error: "Missing or invalid authorization header",
+      error: "Förfrågan nekades. Prova att logga ut och in igen.",
     });
   });
 });
