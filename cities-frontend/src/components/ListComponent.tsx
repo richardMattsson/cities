@@ -11,45 +11,48 @@ type ItemsListProps = {
 
 function ListComponent({ cities, municipalities, regions }: ItemsListProps) {
   return (
-    <>
-      {cities && (
-        <ul className="list-ul">
-          {cities.map((city) => (
-            <Link key={city.cities_id} to={`/detail/city/${city.cities_id}`}>
-              <li data-cy="list-item">{truncateText(city.cities_name, 20)} </li>
-            </Link>
-          ))}
-        </ul>
-      )}
-      {municipalities && (
-        <ul className="list-ul">
-          {municipalities.map((municipality) => (
-            <Link
-              key={municipality.municipalities_id}
-              to={`/detail/municipality/${municipality.municipalities_id}`}
-            >
-              <li data-cy="list-item">
-                {truncateText(municipality.municipalities_name, 20)}{" "}
-              </li>
-            </Link>
-          ))}
-        </ul>
-      )}
-      {regions && (
-        <ul className="list-ul">
-          {regions.map((region) => (
-            <Link
-              key={region.regions_id}
-              to={`/detail/region/${region.regions_id}`}
-            >
-              <li data-cy="list-item">
-                {truncateText(region.regions_name, 20)}{" "}
-              </li>
-            </Link>
-          ))}
-        </ul>
-      )}
-    </>
+    <ul className="list-ul">
+      {cities &&
+        cities.map((city) => (
+          <CustomLink
+            id={city.cities_id}
+            to={`/detail/city/${city.cities_id}`}
+            itemName={city.cities_name}
+          />
+        ))}
+
+      {municipalities &&
+        municipalities.map((municipality) => (
+          <CustomLink
+            id={municipality.municipalities_id}
+            to={`/detail/municipality/${municipality.municipalities_id}`}
+            itemName={municipality.municipalities_name}
+          />
+        ))}
+
+      {regions &&
+        regions.map((region) => (
+          <CustomLink
+            id={region.regions_id}
+            to={`/detail/region/${region.regions_id}`}
+            itemName={region.regions_name}
+          />
+        ))}
+    </ul>
+  );
+}
+
+type CustomLinkProps = {
+  id: number;
+  to: string;
+  itemName: string;
+};
+
+function CustomLink({ id, to, itemName }: CustomLinkProps) {
+  return (
+    <Link key={id} to={to}>
+      <li data-cy="list-item">{truncateText(itemName, 20)} </li>
+    </Link>
   );
 }
 
