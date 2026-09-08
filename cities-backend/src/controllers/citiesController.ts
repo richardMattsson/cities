@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import * as service from "../services/cityService.ts";
 import { HttpError } from "../errors/HttpError.ts";
+import { validationResult } from "express-validator";
 
 async function getCities(_req: Request, res: Response, next: NextFunction) {
   try {
@@ -53,17 +54,14 @@ async function postCity(req: Request, res: Response, next: NextFunction) {
 }
 
 async function updateCity(req: Request, res: Response, next: NextFunction) {
+  const result = validationResult(req);
+
+  if (!result.isEmpty()) {
+    return res.status(400).json({ errors: result.array() });
+  }
+
   const { id } = req.params;
   const { cities_name, cities_population, municipality_id } = req.body;
-
-  if (typeof cities_name !== "string") {
-    res.status(400).json({ error: "Invalid name" });
-  }
-  if (!municipality_id) {
-    res
-      .status(400)
-      .json({ error: "Du behöver ange vilken kommun staden tillhör." });
-  }
 
   try {
     const response = await service.updateCity(
