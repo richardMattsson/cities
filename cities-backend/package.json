@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "engines": {
-    "node": "20.19.0"
+    "node": ">=22.19.0"
   },
   "scripts": {
     "seed": "tsx drizzle/seed.ts",

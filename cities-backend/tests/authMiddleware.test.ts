@@ -43,7 +43,7 @@ describe("authenticateToken", () => {
     let nextCalled = false;
 
     const req = {
-      headers: { authorization: "Bearer " },
+      headers: { authorization: "authorizetoken123" },
     } as any;
 
     const res = {
@@ -74,7 +74,7 @@ describe("authenticateToken", () => {
     let nextCalled = false;
 
     const req = {
-      headers: { authorization: "Bearer eyJhbGciOiJSUzI1NiI" },
+      headers: { authorization: "Bearer " },
     } as any;
 
     const res = {
@@ -95,7 +95,7 @@ describe("authenticateToken", () => {
     assert.equal(nextCalled, false);
     assert.equal(statusCode, 401);
     assert.deepEqual(responseBody, {
-      error: "Invalid or expired token",
+      error: "Förfrågan nekades. Prova att logga ut och in igen.",
     });
   });
 });
