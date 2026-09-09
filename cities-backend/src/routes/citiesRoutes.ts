@@ -4,17 +4,17 @@ import { authenticateToken } from "../middleware/authMiddleware.ts";
 import { body, param } from "express-validator";
 const router = express.Router();
 
-export const addCityValidation = [
+const cityBodyValidation = [
   body("cities_name").isString().trim().notEmpty(),
   body("cities_population").trim().isInt({ min: 0 }),
   body("municipality_id").trim().isInt({ min: 1 }),
 ];
 
+export const addCityValidation = [...cityBodyValidation];
+
 export const updateCityValidation = [
   param("id").trim().isInt({ min: 1 }),
-  body("cities_name").isString().trim().notEmpty(),
-  body("cities_population").trim().isInt({ min: 0 }),
-  body("municipality_id").trim().isInt({ min: 1 }),
+  ...cityBodyValidation,
 ];
 
 router.get("/", controller.getCities);
