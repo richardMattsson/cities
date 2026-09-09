@@ -1,4 +1,4 @@
-import test, { describe, it } from "node:test";
+import { describe, it } from "node:test";
 import { addCityValidation } from "../src/routes/citiesRoutes";
 import { validationResult } from "express-validator";
 import assert from "node:assert";
@@ -11,6 +11,22 @@ describe("Test for invalid city input", () => {
         cities_name: "",
         cities_population: -5,
         municipality_id: 0,
+      },
+    };
+
+    await Promise.all(addCityValidation.map((validator) => validator.run(req)));
+
+    const result = validationResult(req);
+
+    assert.equal(result.isEmpty(), false);
+  });
+
+  it("Rejects a city name containing only white space.", async () => {
+    const req = {
+      body: {
+        cities_name: "     ",
+        cities_population: 15,
+        municipality_id: 1,
       },
     };
 
