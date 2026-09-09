@@ -54,7 +54,8 @@ function CityDetailView({ id }: { id: number }) {
       try {
         const response = await getOneCityAPI(Number(id));
         if (!response.ok) {
-          console.log("error fetching resource");
+          const result = await response.json();
+          setErrorMsg(result.error);
           return;
         }
         const result = await response.json();

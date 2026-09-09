@@ -103,7 +103,12 @@ describe("cities", () => {
       });
       createdCityId = undefined;
       cy.contains("Du har tagit bort en stad").should("be.visible");
-      cy.request(`/api/cities/${cityId}`).its("body").should("deep.equal", []);
+      cy.request({
+        url: `/api/cities/${cityId}`,
+        failOnStatusCode: false,
+      })
+        .its("status")
+        .should("eq", 404);
       cy.visit("/#/cities");
       cy.contains('[data-cy="list-item"]', name).should("not.exist");
     });

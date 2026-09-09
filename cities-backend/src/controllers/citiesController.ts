@@ -12,15 +12,24 @@ async function getCities(_req: Request, res: Response, next: NextFunction) {
   }
 }
 
-async function getOneCity(req: Request, res: Response, next: NextFunction) {
-  const { id } = req.params;
-  try {
-    const cities = await service.getOneCity(Number(id));
-    res.json(cities);
-  } catch (error) {
-    next(error);
-  }
+function createGetOneCityHandler(getOneCity: typeof service.getOneCity) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+      const cities = await getOneCity(Number(id));
+      if (cities.length < 1) {
+        res.status(404);
+        return next(new HttpError(404, "Kunde inte hitta staden"));
+      }
+
+      res.json(cities);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
+
+const getOneCity = createGetOneCityHandler(service.getOneCity);
 
 async function sumOfCities(_req: Request, res: Response, next: NextFunction) {
   try {
@@ -107,6 +116,7 @@ export {
   postCity,
   updateCity,
   deleteCity,
+  createGetOneCityHandler,
   createPostCityHandler,
   createUpdateCityHandler,
 };
