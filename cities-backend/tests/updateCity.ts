@@ -7,7 +7,7 @@ import type { Response } from "express";
 
 type ResponseType = Response<any, Record<string, any>>;
 
-describe("Detect unvalid city input", () => {
+describe("Detect invalid city input", () => {
   it("rejects an invalid request to update a city", async () => {
     const req = {
       params: { id: 0 },
@@ -24,7 +24,7 @@ describe("Detect unvalid city input", () => {
     assert.equal(result.array().length, 4);
   });
 
-  it("controller returns 400 for invalid city data", async () => {
+  it("controller returns 400 for invalid city data and correct error message", async () => {
     const req = {
       params: { id: "0" },
       body: {
@@ -36,6 +36,11 @@ describe("Detect unvalid city input", () => {
 
     let statusCode = 0;
     let responseBody: unknown;
+    let nextCalled = false;
+
+    const next = () => {
+      nextCalled = true;
+    };
 
     const res = {
       status(code: number) {
@@ -51,9 +56,30 @@ describe("Detect unvalid city input", () => {
       updateCityValidation.map((validator) => validator.run(req)),
     );
 
-    await controller.updateCity(req, res, () => {});
+    let callCount = 0;
 
+    async function fakeUpdateCity() {
+      callCount++;
+      const response = [
+        {
+          cities_id: 0,
+          cities_name: "",
+          cities_population: 0,
+          municipality_id: 1,
+        },
+      ];
+
+      return response;
+    }
+
+    const testHandler = controller.createUpdateCityHandler(fakeUpdateCity);
+    await testHandler(req, res, next);
+
+    assert.equal(nextCalled, false);
+    assert.equal(callCount, 0);
     assert.equal(statusCode, 400);
-    assert.ok(responseBody);
+    assert.deepEqual(responseBody, {
+      error: "Ogiltig input",
+    });
   });
 });
