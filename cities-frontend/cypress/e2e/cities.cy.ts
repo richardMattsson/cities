@@ -113,10 +113,17 @@ describe("cities", () => {
       cy.contains('[data-cy="list-item"]', name).should("not.exist");
     });
   });
-});
 
-it('Empty state', function() {
-  cy.visit('http://localhost:5173/#/detail/city/-1')
-  
-  cy.get('#root p').should('have.text', 'Kunde inte hitta staden');
+  it("Empty state", function () {
+    cy.intercept("GET", "/api/cities/-1").as("getOneCity");
+    cy.visit("/#/detail/city/-1");
+    cy.wait("@getOneCity").then(({ response }) => {
+      expect(response?.statusCode).to.eq(404);
+    });
+
+    cy.get('[data-cy="city-detail-error"]').should(
+      "have.text",
+      "Kunde inte hitta staden",
+    );
+  });
 });

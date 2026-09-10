@@ -34,37 +34,47 @@ export default function DetailView() {
 }
 
 function CityDetailView({ id }: { id: number }) {
-  const [city, setCity] = useState<City>({
-    cities_id: 0,
-    cities_name: "",
-    cities_population: "",
-    municipality_id: 0,
-  });
+  const [city, setCity] = useState<City>();
   const [municipalities, setMunicipalities] = useState<Municipality[]>();
+  const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
   const municipality = municipalities?.find(
-    (municipality) => municipality.municipalities_id === city.municipality_id,
+    (municipality) => municipality.municipalities_id === city?.municipality_id,
   );
   const municipalityId = municipality?.municipalities_id;
 
   useEffect(() => {
     let mounted = true;
     (async () => {
+      setErrorMsg("");
+      setLoading(true);
+      setCity(undefined);
+
       try {
         const response = await getOneCityAPI(Number(id));
+
         if (!response.ok) {
           const result = await response.json();
+
+          if (!mounted) return;
+
           setErrorMsg(result.error);
+          setLoading(false);
           return;
         }
+
         const result = await response.json();
 
         if (!mounted) return;
 
+        setLoading(false);
         startTransition(() => setCity(result[0]));
       } catch {
-        if (mounted) return;
+        if (!mounted) return;
+
+        setErrorMsg("Något gick fel med att hämta staden");
+        setLoading(false);
       }
     })();
     return () => {
@@ -113,9 +123,10 @@ function CityDetailView({ id }: { id: number }) {
 
   return (
     <article className="detail-article">
-      {errorMsg && <p>{errorMsg}</p>}
+      {loading && <p data-cy="city-detail-loading">Laddar...</p>}
+      {errorMsg && <p data-cy="city-detail-error">{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
-      {city.cities_name && (
+      {city && (
         <>
           <DetailInfoSection
             title="Stad"
@@ -123,7 +134,10 @@ function CityDetailView({ id }: { id: number }) {
             population={city && city.cities_population}
             label="Kommun"
             children={
-              <Link to={`/detail/municipality/${municipalityId ?? ""}`}>
+              <Link
+                key={city?.cities_id}
+                to={`/detail/municipality/${municipalityId ?? ""}`}
+              >
                 <li>{municipality && municipality.municipalities_name}</li>
               </Link>
             }

@@ -38,7 +38,7 @@ describe("Testing get request of one city", () => {
 
     assert.ok(nextError instanceof HttpError);
     assert.equal(statusCode, 0);
-    assert.ok(!responseBody);
+    assert.ok(responseBody === undefined);
     assert.equal((nextError as HttpError).status, 404);
     assert.equal((nextError as HttpError).message, "Kunde inte hitta staden");
   });
