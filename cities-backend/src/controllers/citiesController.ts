@@ -86,8 +86,8 @@ function createUpdateCityHandler(updateCity: typeof service.updateCity) {
         Number(municipality_id),
         Number(id),
       );
-      if (!response) {
-        return next(new HttpError(404, "City not found"));
+      if (!response || response.length < 1) {
+        return next(new HttpError(404, "Kunde inte hitta staden"));
       }
       res.status(200).json(response);
     } catch (error) {
@@ -98,15 +98,22 @@ function createUpdateCityHandler(updateCity: typeof service.updateCity) {
 
 const updateCity = createUpdateCityHandler(service.updateCity);
 
-async function deleteCity(req: Request, res: Response, next: NextFunction) {
-  const { id } = req.params;
-  try {
-    const result = await service.deleteCity(Number(id));
-    res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
+function createDeleteCityHandler(deleteCity: typeof service.deleteCity) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+      const response = await deleteCity(Number(id));
+      if (!response || response.length < 1) {
+        return next(new HttpError(404, "Kunde inte hitta staden"));
+      }
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
+
+const deleteCity = createDeleteCityHandler(service.deleteCity);
 
 export {
   getCities,
@@ -118,4 +125,5 @@ export {
   createGetOneCityHandler,
   createPostCityHandler,
   createUpdateCityHandler,
+  createDeleteCityHandler,
 };

@@ -4,10 +4,36 @@ import { updateCityValidation } from "../src/routes/citiesRoutes";
 import assert from "node:assert";
 import { validationResult } from "express-validator";
 import type { Response } from "express";
+import { HttpError } from "../src/errors/HttpError";
 
 type ResponseType = Response<any, Record<string, any>>;
 
-describe("Detect invalid city input", () => {
+describe("Detect invalid city request", () => {
+  it("Handle not found city that returns empty array", async () => {
+    let nextError: unknown;
+
+    const req = {
+      params: { id: "-1" },
+    } as any;
+
+    const res = {} as any;
+
+    async function fakeUpdateCity() {
+      return [];
+    }
+
+    const next = (error: unknown) => {
+      nextError = error;
+    };
+
+    const testHandler = controller.createGetOneCityHandler(fakeUpdateCity);
+    await testHandler(req, res, next);
+
+    assert.ok(nextError instanceof HttpError);
+    assert.equal((nextError as HttpError).status, 404);
+    assert.equal((nextError as HttpError).message, "Kunde inte hitta staden");
+  });
+
   it("rejects an invalid request to update a city", async () => {
     const req = {
       params: { id: 0 },
