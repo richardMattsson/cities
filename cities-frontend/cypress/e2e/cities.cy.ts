@@ -114,3 +114,9 @@ describe("cities", () => {
     });
   });
 });
+
+it('Empty state', function() {
+  cy.visit('http://localhost:5173/#/detail/city/-1')
+  
+  cy.get('#root p').should('have.text', 'Kunde inte hitta staden');
+});

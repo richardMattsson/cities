@@ -18,7 +18,6 @@ function createGetOneCityHandler(getOneCity: typeof service.getOneCity) {
     try {
       const cities = await getOneCity(Number(id));
       if (cities.length < 1) {
-        res.status(404);
         return next(new HttpError(404, "Kunde inte hitta staden"));
       }
 

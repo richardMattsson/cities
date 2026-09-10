@@ -113,24 +113,27 @@ function CityDetailView({ id }: { id: number }) {
 
   return (
     <article className="detail-article">
-      <DetailInfoSection
-        title="Stad"
-        name={city && city.cities_name}
-        population={city && city.cities_population}
-        label="Kommun"
-        children={
-          <Link to={`/detail/municipality/${municipalityId ?? ""}`}>
-            <li>{municipality && municipality.municipalities_name}</li>
-          </Link>
-        }
-      />
       {errorMsg && <p>{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
-
-      <DetailButtonSection
-        to={`/form/city/update/${id}`}
-        onClick={deleteCity}
-      />
+      {city.cities_name && (
+        <>
+          <DetailInfoSection
+            title="Stad"
+            name={city && city.cities_name}
+            population={city && city.cities_population}
+            label="Kommun"
+            children={
+              <Link to={`/detail/municipality/${municipalityId ?? ""}`}>
+                <li>{municipality && municipality.municipalities_name}</li>
+              </Link>
+            }
+          />
+          <DetailButtonSection
+            to={`/form/city/update/${id}`}
+            onClick={deleteCity}
+          />
+        </>
+      )}
     </article>
   );
 }
