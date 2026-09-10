@@ -10,25 +10,46 @@ type ResponseType = Response<any, Record<string, any>>;
 
 describe("Detect invalid city request", () => {
   it("Handle not found city that returns empty array", async () => {
-    let nextError: unknown;
+    let statusCode = 0;
+    let responseBody: unknown;
 
     const req = {
-      params: { id: "-1" },
+      params: { id: "200000" },
+      body: { cities_name: "test", cities_population: 123, municipality_id: 1 },
     } as any;
 
-    const res = {} as any;
+    const res = {
+      status(code: number) {
+        statusCode = code;
+        return this;
+      },
+      json(body: unknown) {
+        responseBody = body;
+      },
+    } as any;
 
     async function fakeUpdateCity() {
       return [];
     }
-
+    let nextError: unknown;
     const next = (error: unknown) => {
       nextError = error;
     };
 
-    const testHandler = controller.createGetOneCityHandler(fakeUpdateCity);
+    const testHandler = controller.createUpdateCityHandler(fakeUpdateCity);
+
+    await Promise.all(
+      updateCityValidation.map((validator) => validator.run(req)),
+    );
+
+    const result = validationResult(req);
+
+    assert.equal(result.isEmpty(), true);
+
     await testHandler(req, res, next);
 
+    assert.equal(statusCode, 0);
+    assert.ok(responseBody === undefined);
     assert.ok(nextError instanceof HttpError);
     assert.equal((nextError as HttpError).status, 404);
     assert.equal((nextError as HttpError).message, "Kunde inte hitta staden");
@@ -36,7 +57,7 @@ describe("Detect invalid city request", () => {
 
   it("rejects an invalid request to update a city", async () => {
     const req = {
-      params: { id: 0 },
+      params: { id: "0" },
       body: { cities_name: "", cities_population: -5, municipality_id: 0 },
     } as any;
 
@@ -82,6 +103,8 @@ describe("Detect invalid city request", () => {
       updateCityValidation.map((validator) => validator.run(req)),
     );
 
+    const result = validationResult(req);
+
     let callCount = 0;
 
     async function fakeUpdateCity() {
@@ -101,6 +124,7 @@ describe("Detect invalid city request", () => {
     const testHandler = controller.createUpdateCityHandler(fakeUpdateCity);
     await testHandler(req, res, next);
 
+    assert.equal(result.isEmpty(), false);
     assert.equal(nextCalled, false);
     assert.equal(callCount, 0);
     assert.equal(statusCode, 400);
