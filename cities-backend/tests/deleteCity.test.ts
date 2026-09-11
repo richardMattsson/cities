@@ -4,77 +4,88 @@ import assert from "node:assert";
 import { HttpError } from "../src/errors/HttpError";
 import { validate } from "../src/middleware/validateInputMiddleware";
 import { deleteCityValidation } from "../src/validation/cityValidation";
+import { createResponse } from "./helpers/createResponse";
 
 describe("Delete a city that does'nt exist", () => {
   it("handle request on a city that returns an empty array", async () => {
     let nextError: unknown;
-    let statusCode = 0;
-    let responseBody: unknown;
+    let serviceCallCount = 0;
 
-    const req = { params: { id: "20000" } } as any;
-    const res = {
-      status(code: number) {
-        statusCode = code;
-        return this;
-      },
-      json(body: unknown) {
-        responseBody = body;
-      },
-    } as any;
-
-    const next = (error: unknown) => {
-      nextError = error;
-    };
-
-    async function fakeDeleteCity() {
+    async function fakeDeleteCity(id: number) {
+      serviceCallCount++;
+      assert.equal(id, 2000);
       return [];
     }
-    const result = createDeleteCityHandler(fakeDeleteCity);
-    await result(req, res, next);
 
-    assert.equal(statusCode, 0);
-    assert.ok(responseBody === undefined);
-    assert.ok(nextError instanceof HttpError);
-    assert.equal((nextError as HttpError).message, "Kunde inte hitta staden");
-    assert.equal((nextError as HttpError).status, 404);
-  });
-
-  it("Invalid id return status 400", async () => {
-    let statusCode = 0;
-    let responseBody: unknown;
-    let nextCalled = false;
-    let callCount = 0;
+    const handler = createDeleteCityHandler(fakeDeleteCity);
+    const middleware = validate(deleteCityValidation);
+    const { response, getStatus, wasStatusCalled, wasJsonCalled } =
+      createResponse();
 
     const req = {
       params: {
-        id: "-1",
+        id: "2000",
       },
     } as any;
 
-    const res = {
-      status(code: number) {
-        statusCode = code;
-        return this;
-      },
-      json(body: unknown) {
-        responseBody = body;
-      },
-    } as any;
+    await new Promise<void>((resolve, reject) => {
+      middleware(req, response, (error?: unknown) => {
+        if (error) {
+          reject(error);
+          return;
+        }
 
-    const next = () => {
-      callCount++;
-      nextCalled = true;
-    };
-
-    const middleware = validate(deleteCityValidation);
-
-    await middleware(req, res, next);
-
-    assert.equal(statusCode, 400);
-    assert.equal(nextCalled, false);
-    assert.equal(callCount, 0);
-    assert.deepEqual(responseBody, {
-      error: "Ogiltig input",
+        handler(req, response, (handlerError: unknown) => {
+          nextError = handlerError;
+          resolve();
+        }).catch(reject);
+      }).catch(reject);
     });
+
+    assert.equal(serviceCallCount, 1);
+    assert.equal(getStatus(), 200);
+    assert.ok(nextError instanceof HttpError);
+    assert.equal((nextError as HttpError).status, 404);
+    assert.equal((nextError as HttpError).message, "Kunde inte hitta staden");
+    assert.equal(wasStatusCalled(), false);
+    assert.equal(wasJsonCalled(), false);
   });
+
+  const invalidIds = ["not-a-number", "0", "-1"];
+
+  for (const invalidId of invalidIds) {
+    it(`rejects invalid id "${invalidId}"`, async () => {
+      let serviceCallCount = 0;
+
+      async function fakeDeleteCity() {
+        serviceCallCount++;
+        return [];
+      }
+
+      const handler = createDeleteCityHandler(fakeDeleteCity);
+      const middleware = validate(deleteCityValidation);
+      const { response, getStatus, getBody, wasStatusCalled, wasJsonCalled } =
+        createResponse();
+
+      const req = {
+        params: {
+          id: invalidId,
+        },
+      } as any;
+
+      let downstreamHandlerCalled = false;
+
+      await middleware(req, response, () => {
+        downstreamHandlerCalled = true;
+        return handler(req, response, () => {});
+      });
+
+      assert.equal(getStatus(), 400);
+      assert.deepEqual(getBody(), { error: "Ogiltig input" });
+      assert.equal(wasStatusCalled(), true);
+      assert.equal(wasJsonCalled(), true);
+      assert.equal(downstreamHandlerCalled, false);
+      assert.equal(serviceCallCount, 0);
+    });
+  }
 });

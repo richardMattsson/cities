@@ -4,12 +4,23 @@ import { HttpError } from "../src/errors/HttpError";
 import assert from "node:assert";
 import { validate } from "../src/middleware/validateInputMiddleware";
 import { getOneCityValidation } from "../src/validation/cityValidation";
+import { createResponse } from "./helpers/createResponse";
 
 describe("Testing get request of one city", () => {
   it("returns error 404 when a city does not exist", async () => {
     let nextError: unknown;
-    let statusCode = 0;
-    let responseBody: unknown;
+    let serviceCallCount = 0;
+
+    async function fakeGetOneCity(id: number) {
+      serviceCallCount++;
+      assert.equal(id, 2000);
+      return [];
+    }
+
+    const handler = createGetOneCityHandler(fakeGetOneCity);
+    const middleware = validate(getOneCityValidation);
+    const { response, getStatus, wasStatusCalled, wasJsonCalled } =
+      createResponse();
 
     const req = {
       params: {
@@ -17,70 +28,64 @@ describe("Testing get request of one city", () => {
       },
     } as any;
 
-    const res = {
-      status(code: number) {
-        statusCode = code;
-        return this;
-      },
-      json(body: unknown) {
-        responseBody = body;
-      },
-    } as any;
+    await new Promise<void>((resolve, reject) => {
+      middleware(req, response, (error?: unknown) => {
+        if (error) {
+          reject(error);
+          return;
+        }
 
-    async function fakeGetOneCity() {
-      return [];
-    }
+        handler(req, response, (handlerError: unknown) => {
+          nextError = handlerError;
+          resolve();
+        }).catch(reject);
+      }).catch(reject);
+    });
 
-    const next = (error: unknown) => {
-      nextError = error;
-    };
-
-    const testHandler = createGetOneCityHandler(fakeGetOneCity);
-    await testHandler(req, res, next);
-
+    assert.equal(serviceCallCount, 1);
+    assert.equal(getStatus(), 200);
     assert.ok(nextError instanceof HttpError);
-    assert.equal(statusCode, 0);
-    assert.ok(responseBody === undefined);
     assert.equal((nextError as HttpError).status, 404);
     assert.equal((nextError as HttpError).message, "Kunde inte hitta staden");
+    assert.equal(wasStatusCalled(), false);
+    assert.equal(wasJsonCalled(), false);
   });
 
-  it("Invalid id return status 400", async () => {
-    let statusCode = 0;
-    let responseBody: unknown;
-    let nextCalled = false;
-    let callCount = 0;
+  const invalidIds = ["not-a-number", "0", "-1"];
 
-    const req = {
-      params: {
-        id: "-1",
-      },
-    } as any;
+  for (const invalidId of invalidIds) {
+    it(`rejects invalid id "${invalidId}"`, async () => {
+      let serviceCallCount = 0;
 
-    const res = {
-      status(code: number) {
-        statusCode = code;
-        return this;
-      },
-      json(body: unknown) {
-        responseBody = body;
-      },
-    } as any;
+      async function fakeGetOneCity() {
+        serviceCallCount++;
+        return [];
+      }
 
-    const next = () => {
-      callCount++;
-      nextCalled = true;
-    };
+      const handler = createGetOneCityHandler(fakeGetOneCity);
+      const middleware = validate(getOneCityValidation);
+      const { response, getStatus, getBody, wasStatusCalled, wasJsonCalled } =
+        createResponse();
 
-    const middleware = validate(getOneCityValidation);
+      const req = {
+        params: {
+          id: invalidId,
+        },
+      } as any;
 
-    await middleware(req, res, next);
+      let downstreamHandlerCalled = false;
 
-    assert.equal(statusCode, 400);
-    assert.equal(nextCalled, false);
-    assert.equal(callCount, 0);
-    assert.deepEqual(responseBody, {
-      error: "Ogiltig input",
+      await middleware(req, response, () => {
+        downstreamHandlerCalled = true;
+        return handler(req, response, () => {});
+      });
+
+      assert.equal(getStatus(), 400);
+      assert.deepEqual(getBody(), { error: "Ogiltig input" });
+      assert.equal(wasStatusCalled(), true);
+      assert.equal(wasJsonCalled(), true);
+      assert.equal(downstreamHandlerCalled, false);
+      assert.equal(serviceCallCount, 0);
     });
-  });
+  }
 });
