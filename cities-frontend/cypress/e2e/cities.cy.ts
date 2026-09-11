@@ -115,8 +115,8 @@ describe("cities", () => {
   });
 
   it("Empty state", function () {
-    cy.intercept("GET", "/api/cities/-1").as("getOneCity");
-    cy.visit("/#/detail/city/-1");
+    cy.intercept("GET", "/api/cities/2000").as("getOneCity");
+    cy.visit("/#/detail/city/2000");
     cy.wait("@getOneCity").then(({ response }) => {
       expect(response?.statusCode).to.eq(404);
     });
