@@ -1,26 +1,10 @@
 import { describe, it } from "node:test";
-import { addCityValidation } from "../src/routes/citiesRoutes";
 import { validationResult } from "express-validator";
 import assert from "node:assert";
-import { createPostCityHandler } from "../src/controllers/citiesController";
+import { validate } from "../src/middleware/validateInputMiddleware";
+import { addCityValidation } from "../src/validation/cityValidation";
 
 describe("Test for invalid city input", () => {
-  it("Rejects an invalid request to add a new city", async () => {
-    const req = {
-      body: {
-        cities_name: "",
-        cities_population: -5,
-        municipality_id: 0,
-      },
-    };
-
-    await Promise.all(addCityValidation.map((validator) => validator.run(req)));
-
-    const result = validationResult(req);
-
-    assert.equal(result.isEmpty(), false);
-  });
-
   it("Rejects a city name containing only white space.", async () => {
     const req = {
       body: {
@@ -38,21 +22,18 @@ describe("Test for invalid city input", () => {
   });
 
   it("test if the bad request hits the service layer", async () => {
-    const req = {
-      body: {
-        cities_name: "",
-        cities_population: -5,
-        municipality_id: 0,
-      },
-    } as any;
-
     let statusCode = 0;
     let responseBody: unknown;
     let nextCalled = false;
+    let callCount = 0;
 
-    const next = () => {
-      nextCalled = true;
-    };
+    const req = {
+      body: {
+        cities_name: "",
+        cities_population: 5,
+        municipality_id: 10,
+      },
+    } as any;
 
     const res = {
       status(code: number) {
@@ -64,28 +45,18 @@ describe("Test for invalid city input", () => {
       },
     } as any;
 
-    await Promise.all(addCityValidation.map((validator) => validator.run(req)));
-
-    let callCount = 0;
-    async function fakePostCity() {
+    const next = () => {
       callCount++;
-      const response = [
-        {
-          cities_id: 0,
-          cities_name: "",
-          cities_population: 0,
-          municipality_id: 1,
-        },
-      ];
+      nextCalled = true;
+    };
 
-      return response;
-    }
-    const testHandler = createPostCityHandler(fakePostCity);
-    await testHandler(req, res, next);
+    const middleware = validate(addCityValidation);
 
+    await middleware(req, res, next);
+
+    assert.equal(statusCode, 400);
     assert.equal(nextCalled, false);
     assert.equal(callCount, 0);
-    assert.equal(statusCode, 400);
     assert.deepEqual(responseBody, {
       error: "Ogiltig input",
     });

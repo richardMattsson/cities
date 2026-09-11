@@ -1,10 +1,11 @@
 import { describe, it } from "node:test";
 import * as controller from "../src/controllers/citiesController";
-import { updateCityValidation } from "../src/routes/citiesRoutes";
 import assert from "node:assert";
 import { validationResult } from "express-validator";
 import type { Response } from "express";
 import { HttpError } from "../src/errors/HttpError";
+import { updateCityValidation } from "../src/validation/cityValidation";
+import { validate } from "../src/middleware/validateInputMiddleware";
 
 type ResponseType = Response<any, Record<string, any>>;
 
@@ -71,7 +72,12 @@ describe("Detect invalid city request", () => {
     assert.equal(result.array().length, 4);
   });
 
-  it("controller returns 400 for invalid city data and correct error message", async () => {
+  it("request with invalid input returns status 400 and correct error message", async () => {
+    let statusCode = 0;
+    let responseBody: unknown;
+    let nextCalled = false;
+    let callCount = 0;
+
     const req = {
       params: { id: "0" },
       body: {
@@ -80,14 +86,6 @@ describe("Detect invalid city request", () => {
         municipality_id: 0,
       },
     } as any;
-
-    let statusCode = 0;
-    let responseBody: unknown;
-    let nextCalled = false;
-
-    const next = () => {
-      nextCalled = true;
-    };
 
     const res = {
       status(code: number) {
@@ -99,32 +97,15 @@ describe("Detect invalid city request", () => {
       },
     } as ResponseType;
 
-    await Promise.all(
-      updateCityValidation.map((validator) => validator.run(req)),
-    );
-
-    const result = validationResult(req);
-
-    let callCount = 0;
-
-    async function fakeUpdateCity() {
+    const next = () => {
       callCount++;
-      const response = [
-        {
-          cities_id: 0,
-          cities_name: "",
-          cities_population: 0,
-          municipality_id: 1,
-        },
-      ];
+      nextCalled = true;
+    };
 
-      return response;
-    }
+    const middleware = validate(updateCityValidation);
 
-    const testHandler = controller.createUpdateCityHandler(fakeUpdateCity);
-    await testHandler(req, res, next);
+    await middleware(req, res, next);
 
-    assert.equal(result.isEmpty(), false);
     assert.equal(nextCalled, false);
     assert.equal(callCount, 0);
     assert.equal(statusCode, 400);

@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import * as service from "../services/cityService.ts";
 import { HttpError } from "../errors/HttpError.ts";
-import { validationResult } from "express-validator";
 
 async function getCities(_req: Request, res: Response, next: NextFunction) {
   try {
@@ -41,14 +40,6 @@ async function sumOfCities(_req: Request, res: Response, next: NextFunction) {
 
 function createPostCityHandler(postCity: typeof service.postCity) {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const result = validationResult(req);
-
-    if (!result.isEmpty()) {
-      return res.status(400).json({
-        error: "Ogiltig input",
-      });
-    }
-
     const { cities_name, cities_population, municipality_id } = req.body;
 
     try {
@@ -68,14 +59,6 @@ const postCity = createPostCityHandler(service.postCity);
 
 function createUpdateCityHandler(updateCity: typeof service.updateCity) {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const result = validationResult(req);
-
-    if (!result.isEmpty()) {
-      return res.status(400).json({
-        error: "Ogiltig input",
-      });
-    }
-
     const { id } = req.params;
     const { cities_name, cities_population, municipality_id } = req.body;
 
