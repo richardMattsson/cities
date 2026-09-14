@@ -1,16 +1,12 @@
-import express, {
-  type NextFunction,
-  type Request,
-  type Response,
-} from "express";
+import express from "express";
 import citiesRoutes from "./routes/citiesRoutes.ts";
 import municipalityRoutes from "./routes/municipalityRoutes.ts";
 import regionRoutes from "./routes/regionRoutes.ts";
-import { HttpError } from "./errors/HttpError.ts";
 import dotenv from "dotenv";
 import { initializeApp, cert } from "firebase-admin/app";
 import { readFileSync } from "fs";
 import { resolve } from "path";
+import { errorHandler } from "./middleware/errorHandler.ts";
 
 dotenv.config();
 
@@ -53,11 +49,6 @@ app.use("/api/regions", regionRoutes);
 app.use("/api/municipalities", municipalityRoutes);
 app.use("/api/cities", citiesRoutes);
 
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("Error:", err.message);
-  const status = err instanceof HttpError ? err.status : 500;
-  const message = err instanceof Error ? err.message : String(err);
-  res.status(status).json({ error: message });
-});
+app.use(errorHandler);
 
 app.listen(port, () => console.log(`App is running on port ${port}`));
