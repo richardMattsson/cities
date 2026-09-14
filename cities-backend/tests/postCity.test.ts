@@ -3,6 +3,9 @@ import { validationResult } from "express-validator";
 import assert from "node:assert";
 import { validate } from "../src/middleware/validateInputMiddleware";
 import { addCityValidation } from "../src/validation/cityValidation";
+import { createResponse } from "./helpers/createResponse";
+import { createPostCityHandler } from "../src/controllers/citiesController";
+import { DrizzleQueryError } from "drizzle-orm";
 
 describe("Test for invalid city input", () => {
   it("Rejects a city name containing only white space.", async () => {
@@ -60,5 +63,39 @@ describe("Test for invalid city input", () => {
     assert.deepEqual(responseBody, {
       error: "Ogiltig input",
     });
+  });
+
+  it("expect the controller to forward the original error", async () => {
+    let nextError: unknown;
+
+    const cause = Object.assign(new Error("foreign key violation"), {
+      code: "23503",
+    });
+
+    const databaseError = new DrizzleQueryError(
+      "insert into cities",
+      [],
+      cause,
+    );
+
+    const fakePostCity = async () => {
+      throw databaseError;
+    };
+    const handler = createPostCityHandler(fakePostCity);
+    const { response } = createResponse();
+
+    const req = {
+      body: {
+        cities_name: "test",
+        cities_population: 5,
+        municipality_id: 1000,
+      },
+    } as any;
+
+    await handler(req, response, (error: unknown) => {
+      nextError = error;
+    });
+
+    assert.strictEqual(nextError, databaseError);
   });
 });

@@ -5,6 +5,7 @@ import { HttpError } from "../src/errors/HttpError";
 import { updateCityValidation } from "../src/validation/cityValidation";
 import { validate } from "../src/middleware/validateInputMiddleware";
 import { createResponse } from "./helpers/createResponse";
+import { DrizzleQueryError } from "drizzle-orm";
 
 describe("Detect invalid city request", () => {
   it("Handle not found city that returns empty array", async () => {
@@ -85,4 +86,40 @@ describe("Detect invalid city request", () => {
       assert.equal(serviceCallCount, 0);
     });
   }
+
+  it("expect the controller to forward the original error", async () => {
+    let nextError: unknown;
+
+    const cause = Object.assign(new Error("foreign key violation"), {
+      code: "23503",
+    });
+
+    const databaseError = new DrizzleQueryError(
+      "insert into cities",
+      [],
+      cause,
+    );
+
+    const fakeUpdateCity = async () => {
+      throw databaseError;
+    };
+
+    const handler = controller.createUpdateCityHandler(fakeUpdateCity);
+    const { response } = createResponse();
+
+    const req = {
+      params: { id: 1 },
+      body: {
+        cities_name: "test",
+        cities_population: 5,
+        municipality_id: 1000,
+      },
+    } as any;
+
+    await handler(req, response, (error: unknown) => {
+      nextError = error;
+    });
+
+    assert.strictEqual(nextError, databaseError);
+  });
 });
