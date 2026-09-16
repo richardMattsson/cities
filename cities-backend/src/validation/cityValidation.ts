@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 
 export const cityBodyValidation = [
   body("cities_name").isString().trim().notEmpty(),
@@ -7,6 +7,10 @@ export const cityBodyValidation = [
 ];
 
 export const cityParamValidation = [param("id").isInt({ min: 1 })];
+
+export const cityQueryValidation = [
+  query("search").optional().trim().isString().isLength({ max: 100 }),
+];
 
 export const updateCityValidation = [
   ...cityParamValidation,

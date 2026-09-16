@@ -7,6 +7,12 @@ export async function getCitiesAPI() {
   return response;
 }
 
+export async function searchCitiesAPI(search: string) {
+  const params = new URLSearchParams({ search });
+  const response = await fetch(`${URL}/?${params.toString()}`);
+  return response;
+}
+
 export async function getOneCityAPI(id: number) {
   const response = await fetch(`${URL}/${id}`);
   return response;

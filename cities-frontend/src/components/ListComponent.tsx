@@ -51,7 +51,7 @@ type CustomLinkProps = {
 function CustomLink({ id, to, itemName }: CustomLinkProps) {
   return (
     <Link key={id} to={to}>
-      <li data-cy="list-item">{truncateText(itemName, 20)} </li>
+      <li data-cy="list-item">{truncateText(itemName, 20)}</li>
     </Link>
   );
 }

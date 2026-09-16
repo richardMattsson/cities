@@ -11,6 +11,21 @@ async function getCities(_req: Request, res: Response, next: NextFunction) {
   }
 }
 
+function createSearchCityHandler(searchCities: typeof service.searchCities) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const search = req.query.search;
+
+    try {
+      const cities = await searchCities(String(search));
+      res.json(cities);
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+const searchCities = createSearchCityHandler(service.searchCities);
+
 function createGetOneCityHandler(getOneCity: typeof service.getOneCity) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
@@ -100,11 +115,13 @@ const deleteCity = createDeleteCityHandler(service.deleteCity);
 
 export {
   getCities,
+  searchCities,
   getOneCity,
   sumOfCities,
   postCity,
   updateCity,
   deleteCity,
+  createSearchCityHandler,
   createGetOneCityHandler,
   createPostCityHandler,
   createUpdateCityHandler,

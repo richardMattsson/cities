@@ -44,7 +44,9 @@ function Navbar() {
       <ul className="Navbar-ul">
         <CustomLink to="/regions">Visa Regioner</CustomLink>
         <CustomLink to="/municipalities">Visa Kommuner</CustomLink>
-        <CustomLink to="/cities">Visa Städer</CustomLink>
+        <CustomLink to="/cities" id="cities-list">
+          Visa Städer
+        </CustomLink>
       </ul>
       <ul className="Navbar-ul">
         <CustomLink to="/form/region/add">Skapa ny region</CustomLink>
@@ -57,16 +59,19 @@ function Navbar() {
 
 type CustomLinkProps = {
   to: string;
+  id?: string;
   children: React.ReactNode;
 };
 
-function CustomLink({ to, children }: CustomLinkProps) {
+function CustomLink({ to, id, children }: CustomLinkProps) {
   const resolvedPath = useResolvedPath(to);
   const isActive = useMatch({ path: resolvedPath.pathname, end: true });
 
   return (
     <Link to={to}>
-      <li className={isActive ? "active" : ""}>{children}</li>
+      <li data-cy={id ?? undefined} className={isActive ? "active" : ""}>
+        {children}
+      </li>
     </Link>
   );
 }

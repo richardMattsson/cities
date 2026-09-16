@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import type { City, Municipality, Region } from "../../../shared/types";
 import ListComponent from "../components/ListComponent";
 import { startTransition, useEffect, useState } from "react";
-import { getCitiesAPI } from "../api/citiesAPI";
+import { getCitiesAPI, searchCitiesAPI } from "../api/citiesAPI";
 import { getRegionsAPI } from "../api/regionsAPI";
 import { getMunicipalitiesAPI } from "../api/municipalitiesAPI";
 import "../css/ListView.css";
@@ -24,16 +24,15 @@ export default function ListView() {
 function CitiesView() {
   const [cities, setCities] = useState<City[]>([]);
   const [input, setInput] = useState("");
-
-  const filteredCities = cities.filter((city) =>
-    city.cities_name.toLowerCase().includes(input.toLowerCase()),
-  );
+  const [debouncedInputValue, setDebouncedInputValue] = useState("");
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const response = await getCitiesAPI();
+        const response = await (debouncedInputValue
+          ? searchCitiesAPI(debouncedInputValue.trim())
+          : getCitiesAPI());
         if (!response.ok) {
           console.log("error fetching resources");
           return;
@@ -49,20 +48,30 @@ function CitiesView() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [debouncedInputValue]);
+
+  useEffect(() => {
+    const delayInputTimeoutId = setTimeout(() => {
+      setDebouncedInputValue(input);
+    }, 300);
+
+    return () => clearTimeout(delayInputTimeoutId);
+  }, [input]);
 
   return (
     <article className="list-container">
       <h2>{`${cities.length} Städer`}</h2>
+
       <input
         autoFocus
+        aria-label="City search input"
         type="text"
         placeholder="Sök..."
         data-cy="list-search"
         value={input}
-        onChange={(e) => setInput(e.target.value)}
+        onChange={(e) => setInput(e.target.value.substring(0, 100))}
       />
-      <ListComponent cities={filteredCities ? filteredCities : cities} />
+      <ListComponent cities={cities} />
     </article>
   );
 }

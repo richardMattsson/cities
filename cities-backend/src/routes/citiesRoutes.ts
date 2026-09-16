@@ -4,13 +4,21 @@ import { authenticateToken } from "../middleware/authMiddleware.ts";
 import { validate } from "../middleware/validateInputMiddleware.ts";
 import {
   addCityValidation,
+  cityQueryValidation,
   deleteCityValidation,
   getOneCityValidation,
   updateCityValidation,
 } from "../validation/cityValidation.ts";
 const router = express.Router();
 
-router.get("/", controller.getCities);
+router.get("/", validate(cityQueryValidation), (req, res, next) => {
+  if (req.query.search) {
+    return controller.searchCities(req, res, next);
+  }
+
+  return controller.getCities(req, res, next);
+});
+
 router.get("/sum", controller.sumOfCities);
 router.get("/:id", validate(getOneCityValidation), controller.getOneCity);
 router.post(

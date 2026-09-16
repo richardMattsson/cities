@@ -1,9 +1,18 @@
-import { eq } from "drizzle-orm";
+import { eq, ilike } from "drizzle-orm";
 import { db } from "../db/index.ts";
 import { cities } from "../db/schema.ts";
 
 async function getCities() {
   const response = await db.select().from(cities).orderBy(cities.cities_name);
+  return response;
+}
+
+async function searchCities(search?: string) {
+  const response = await db
+    .select()
+    .from(cities)
+    .where(search ? ilike(cities.cities_name, `%${search}%`) : undefined)
+    .orderBy(cities.cities_name);
   return response;
 }
 
@@ -58,4 +67,12 @@ async function deleteCity(id: number) {
     .returning();
   return result;
 }
-export { getCities, getOneCity, sumOfCities, postCity, updateCity, deleteCity };
+export {
+  getCities,
+  searchCities,
+  getOneCity,
+  sumOfCities,
+  postCity,
+  updateCity,
+  deleteCity,
+};

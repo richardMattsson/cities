@@ -5,7 +5,7 @@ describe("filter", () => {
     cy.get('[data-cy="list-search"]').should("be.visible");
     cy.get('[data-cy="list-search"]').should("be.enabled");
     cy.get('[data-cy="list-search"]').type("Göteborg");
-    cy.get('[data-cy="list-item"]').should("have.text", "Göteborg Centrum ");
+    cy.get('[data-cy="list-item"]').should("have.text", "Göteborg Centrum");
   });
 
   it("visits the municipality page and finds a municipality with the search input", () => {
@@ -14,7 +14,7 @@ describe("filter", () => {
     cy.get('[data-cy="list-search"]').should("be.visible");
     cy.get('[data-cy="list-search"]').should("be.enabled");
     cy.get('[data-cy="list-search"]').type("Arvika");
-    cy.get('[data-cy="list-item"]').should("have.text", "Arvika ");
+    cy.get('[data-cy="list-item"]').should("have.text", "Arvika");
   });
 
   it("visits the regions page and finds a ragion with the search input", () => {
@@ -23,6 +23,6 @@ describe("filter", () => {
     cy.get('[data-cy="list-item"]').should("be.visible");
     cy.get('[data-cy="list-search"]').should("be.enabled");
     cy.get('[data-cy="list-search"]').type("Blekinge");
-    cy.get('[data-cy="list-item"]').should("have.text", "Blekinge ");
+    cy.get('[data-cy="list-item"]').should("have.text", "Blekinge");
   });
 });

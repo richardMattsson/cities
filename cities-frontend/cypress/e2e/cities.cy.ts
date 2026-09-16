@@ -1,7 +1,7 @@
 describe("cities", () => {
   let createdCityId: number | undefined;
 
-  const cityName = (suffix: string) => `${suffix}${Cypress._.random(10)}`;
+  const cityName = (suffix: string) => `test${suffix}${Cypress._.random(1000)}`;
 
   beforeEach(() => cy.loginByFirebase());
 
@@ -125,5 +125,59 @@ describe("cities", () => {
       "have.text",
       "Kunde inte hitta staden",
     );
+  });
+
+  it("a city search should return matching cities from the api", () => {
+    const name = cityName("search");
+    createCityThroughUi(name, "12345");
+
+    cy.intercept("GET", `/api/cities/?search=${name}`).as("searchCity");
+    cy.get('[data-cy="cities-list"]').click();
+    cy.get('[data-cy="list-search"]').type(name);
+    cy.wait("@searchCity").then(({ request }) => {
+      expect(request.query.search).to.eq(name);
+    });
+    cy.get('[data-cy="list-item"]').should("have.text", name);
+  });
+
+  it("should show a unfiltered list when the searchfield is cleared", () => {
+    const name = "Stockholm";
+    let initialCities: string[] = [];
+
+    cy.intercept("GET", `/api/cities/?search=${name}`).as("searchCity");
+    cy.intercept("GET", "/api/cities").as("getCities");
+
+    cy.visit("/");
+    cy.get('[data-cy="cities-list"]').click();
+
+    cy.wait("@getCities");
+
+    cy.get('[data-cy="list-item"]')
+      .should("have.length.greaterThan", 0)
+      .then(($items) => {
+        initialCities = [...$items].map(
+          (item) => item.textContent?.trim() ?? "",
+        );
+      });
+
+    cy.get('[data-cy="list-search"]').type(name);
+
+    cy.wait("@searchCity").then(({ request }) => {
+      expect(request.query.search).to.eq(name);
+    });
+
+    cy.get('[data-cy="list-search"]').clear();
+
+    cy.wait("@getCities").then(({ request }) => {
+      expect(request.query).to.not.have.property("search");
+    });
+
+    cy.get('[data-cy="list-item"]').should(($items) => {
+      const clearedCities = [...$items].map(
+        (item) => item.textContent?.trim() ?? "",
+      );
+
+      expect(clearedCities).to.deep.equal(initialCities);
+    });
   });
 });
