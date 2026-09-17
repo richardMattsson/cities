@@ -1,15 +1,18 @@
-import { DrizzleQueryError } from "drizzle-orm";
-import type { DatabaseError } from "pg";
-
 export const isForeignKeyConstraintError = (error: unknown): boolean => {
-  if (!(error instanceof DrizzleQueryError)) {
+  if (!error || typeof error !== "object") {
     return false;
   }
 
-  const cause = error.cause;
-  if (!cause || typeof cause !== "object") {
-    return false;
+  if (
+    "code" in error &&
+    ["23503", "23001"].includes(String((error as { code?: unknown }).code))
+  ) {
+    return true;
   }
 
-  return "code" in cause && (cause as DatabaseError).code === "23503";
+  if ("cause" in error) {
+    return isForeignKeyConstraintError((error as { cause?: unknown }).cause);
+  }
+
+  return false;
 };

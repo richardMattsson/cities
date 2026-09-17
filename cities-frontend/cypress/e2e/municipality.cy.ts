@@ -1,22 +1,40 @@
 describe("municipality", () => {
-  let createdKommunId: number | undefined;
+  let createdMunicipalityId: number | undefined;
+  let createdCityId: number | undefined;
 
-  const kommunName = (suffix: string) => `${suffix}${Cypress._.random(10)}`;
+  const municipalityName = (suffix: string) =>
+    `${suffix}${Cypress._.random(1000)}`;
+
+  const cityName = (suffix: string) => `test${suffix}${Cypress._.random(1000)}`;
 
   beforeEach(() => cy.loginByFirebase());
 
   afterEach(() => {
-    if (!createdKommunId) return;
-    cy.getFirebaseIdToken().then((token) => {
-      cy.request({
-        method: "DELETE",
-        url: `/api/municipalities/${createdKommunId}`,
-        headers: { Authorization: `Bearer ${token}` },
-        failOnStatusCode: false,
-      })
-        .its("status")
-        .should("be.oneOf", [200, 404]);
-    });
+    if (createdCityId) {
+      cy.getFirebaseIdToken().then((token) => {
+        cy.request({
+          method: "DELETE",
+          url: `/api/cities/${createdCityId}`,
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false,
+        })
+          .its("status")
+          .should("be.oneOf", [200, 404]);
+      });
+    }
+
+    if (createdMunicipalityId) {
+      cy.getFirebaseIdToken().then((token) => {
+        cy.request({
+          method: "DELETE",
+          url: `/api/municipalities/${createdMunicipalityId}`,
+          headers: { Authorization: `Bearer ${token}` },
+          failOnStatusCode: false,
+        })
+          .its("status")
+          .should("be.oneOf", [200, 404]);
+      });
+    }
   });
 
   function createMunicipalityThroughUi(name: string, population: string) {
@@ -40,14 +58,50 @@ describe("municipality", () => {
         municipalities_name: name,
         municipalities_population: Number(population),
       });
-      createdKommunId = response?.body[0].municipalities_id;
-      expect(createdKommunId, "created municipality id").to.be.a("number");
-      return createdKommunId!;
+      createdMunicipalityId = response?.body[0].municipalities_id;
+      expect(createdMunicipalityId, "created municipality id").to.be.a(
+        "number",
+      );
+      return createdMunicipalityId!;
+    });
+  }
+
+  function createCityThroughUi(
+    name: string,
+    population: string,
+    municipalityId: number,
+  ) {
+    cy.intercept("POST", "/api/cities").as("createCity");
+    cy.intercept("GET", "/api/municipalities").as("getMunicipalities");
+
+    cy.visit("/#/form/city/add");
+    cy.wait("@getMunicipalities");
+
+    cy.get('[data-cy="select-kommun"] option')
+      .filter(`[value="${municipalityId}"]`)
+      .should("exist");
+
+    cy.get('[data-cy="select-kommun"]')
+      .select(String(municipalityId))
+      .should("have.value", String(municipalityId));
+
+    cy.get('[data-cy="input-stad"]').type(name);
+    cy.get('[data-cy="input-befolkning"]').type(population);
+    cy.get('[data-cy="submit-form"]').click();
+
+    return cy.wait("@createCity").then(({ request, response }) => {
+      expect(request.body.municipality_id).to.eq(municipalityId);
+      expect(response?.statusCode).to.eq(201);
+
+      createdCityId = response?.body[0].cities_id;
+      expect(createdCityId, "created city id").to.be.a("number");
+
+      return createdCityId!;
     });
   }
 
   it("should allow an authenticated user to create a municipality", () => {
-    const name = kommunName("create");
+    const name = municipalityName("create");
     createMunicipalityThroughUi(name, "12345");
     cy.intercept("GET", "/api/municipalities").as("getMunicipalities");
     cy.visit("/#/municipalities");
@@ -56,8 +110,8 @@ describe("municipality", () => {
   });
 
   it("should allow an authenticated user to update a municipality", () => {
-    const originalName = kommunName("update-original");
-    const updatedName = kommunName("update-complete");
+    const originalName = municipalityName("update-original");
+    const updatedName = municipalityName("update-complete");
     createMunicipalityThroughUi(originalName, "12345").then(
       (municipalityId) => {
         cy.intercept("GET", `/api/municipalities/${municipalityId}`).as(
@@ -98,7 +152,7 @@ describe("municipality", () => {
   });
 
   it("should allow an authenticated user to delete a municipality", () => {
-    const name = kommunName("delete");
+    const name = municipalityName("delete");
     createMunicipalityThroughUi(name, "12345").then((municipalityId) => {
       cy.intercept("GET", `/api/municipalities/${municipalityId}`).as(
         "getMunicipality",
@@ -115,7 +169,7 @@ describe("municipality", () => {
         expect(request.headers.authorization).to.match(/^Bearer .+/);
         expect(response?.body[0].municipalities_id).to.eq(municipalityId);
       });
-      createdKommunId = undefined;
+      createdMunicipalityId = undefined;
       cy.contains("Du har tagit bort en kommun").should("be.visible");
       cy.request(`/api/municipalities/${municipalityId}`)
         .its("body")
@@ -123,5 +177,48 @@ describe("municipality", () => {
       cy.visit("/#/municipalities");
       cy.contains('[data-cy="list-item"]', name).should("not.exist");
     });
+  });
+
+  it("should not be able to delete a municipality that has cities attached to it", () => {
+    const nameMunicipality = municipalityName("foreign-key-municipality");
+    const nameCity = cityName("foreign-key-city");
+    createMunicipalityThroughUi(nameMunicipality, "12345").then(
+      (municipalityId) => {
+        createCityThroughUi(nameCity, "12345", municipalityId).then(
+          (cityId) => {
+            cy.intercept("GET", `/api/municipalities/${municipalityId}`).as(
+              "getMunicipality",
+            );
+            cy.intercept("DELETE", `/api/municipalities/${municipalityId}`).as(
+              "deleteMunicipality",
+            );
+
+            cy.on("window:confirm", () => true);
+
+            cy.visit(`/#/detail/municipality/${municipalityId}`);
+
+            cy.wait("@getMunicipality");
+
+            cy.get('[data-cy="delete-item"]').click();
+
+            cy.wait("@deleteMunicipality").then(({ response }) => {
+              expect(response?.statusCode).to.eq(409);
+            });
+
+            cy.get('[data-cy="error-msg-municipality"]').should(
+              "have.text",
+              "Du kan inte ta bort kommunen eftersom den har städer.",
+            );
+
+            cy.intercept("GET", `/api/cities/${cityId}`).as("getOneCity");
+
+            cy.visit(`/#/detail/city/${cityId}`);
+            cy.wait("@getOneCity").then(({ response }) => {
+              expect(response?.statusCode).to.eq(200);
+            });
+          },
+        );
+      },
+    );
   });
 });

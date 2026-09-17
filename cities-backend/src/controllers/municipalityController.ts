@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import * as service from "../services/municipalityService.ts";
 import { HttpError } from "../errors/HttpError.ts";
+import { isForeignKeyConstraintError } from "../errors/isForeignKeyConstraintError.ts";
 
 async function getMunicipalities(
   _req: Request,
@@ -131,19 +132,33 @@ async function updateMunicipality(
   }
 }
 
-async function deleteMunicipality(
-  req: Request,
-  res: Response,
-  next: NextFunction,
+function createDeleteMunicipalityHandler(
+  deleteMunicipality: typeof service.deleteMunicipality,
 ) {
-  const { id } = req.params;
-  try {
-    const result = await service.deleteMunicipality(Number(id));
-    res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+      const result = await deleteMunicipality(Number(id));
+
+      res.status(200).json(result);
+    } catch (error) {
+      if (isForeignKeyConstraintError(error)) {
+        return next(
+          new HttpError(
+            409,
+            "Du kan inte ta bort kommunen eftersom den har städer.",
+          ),
+        );
+      }
+
+      next(error);
+    }
+  };
 }
+
+const deleteMunicipality = createDeleteMunicipalityHandler(
+  service.deleteMunicipality,
+);
 
 export {
   getMunicipalities,
@@ -152,5 +167,6 @@ export {
   getCitiesFromMunicipality,
   postMunicipality,
   updateMunicipality,
+  createDeleteMunicipalityHandler,
   deleteMunicipality,
 };

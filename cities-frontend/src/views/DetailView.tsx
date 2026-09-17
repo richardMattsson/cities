@@ -238,18 +238,33 @@ function MunicipalityDetailView({ id }: { id: number }) {
   }, [id]);
 
   async function deleteMunicipality() {
-    try {
-      const deleted = await deleteItem(Number(id), deleteMunicipalityAPI);
+    const token = await getAuth().currentUser?.getIdToken();
 
-      if (deleted) {
-        setSuccesMsg("Du har tagit bort en kommun");
+    if (!token) {
+      return setErrorMsg("Du måste vara inloggad för att ta bort en kommun.");
+    }
+
+    const proceed = confirm("Vill du verkligen ta bort?");
+
+    if (!proceed) {
+      return;
+    }
+
+    setErrorMsg("");
+    setSuccesMsg("");
+
+    try {
+      const response = await deleteMunicipalityAPI(id, token);
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return setErrorMsg(result.error);
       }
-    } catch (error) {
-      if (error instanceof Error && error.message === "NOT_AUTHENTICATED") {
-        setErrorMsg("Du måste vara inloggad för att ta bort en kommun.");
-      } else {
-        setErrorMsg("Något gick fel.");
-      }
+
+      setSuccesMsg("Du har tagit bort en kommun");
+    } catch {
+      setErrorMsg("Något gick fel.");
     }
   }
 
@@ -270,7 +285,7 @@ function MunicipalityDetailView({ id }: { id: number }) {
         }
         region={region}
       />
-      {errorMsg && <p>{errorMsg}</p>}
+      {errorMsg && <p data-cy="error-msg-municipality">{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
       <DetailButtonSection
         to={`/form/municipality/update/${id}`}

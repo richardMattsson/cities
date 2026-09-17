@@ -23,7 +23,7 @@ export const cities = pgTable("cities", {
   municipality_id: integer().references(
     () => municipalities.municipalities_id,
     {
-      onDelete: "cascade",
+      onDelete: "restrict",
       onUpdate: "cascade",
     },
   ),
