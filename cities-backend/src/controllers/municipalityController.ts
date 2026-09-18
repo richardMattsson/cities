@@ -57,80 +57,59 @@ async function getCitiesFromMunicipality(
   }
 }
 
-async function postMunicipality(
-  req: Request,
-  res: Response,
-  next: NextFunction,
+function createPostMunicipalityHandler(
+  postMunicipality: typeof service.postMunicipality,
 ) {
-  const { municipalities_name, municipalities_population, region_id } =
-    req.body;
-  if (typeof municipalities_name !== "string") {
-    res.status(400).json({ error: "Invalid name" });
-  }
-  if (!region_id) {
-    res
-      .status(400)
-      .json({ error: "Du behöver ange vilken region kommunen tillhör." });
-  }
-  try {
-    const response = await service.postMunicipality(
-      municipalities_name,
-      Number(municipalities_population),
-      Number(region_id),
-    );
-    res.status(201).json(response);
-  } catch (error) {
-    next(error);
-  }
-}
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { municipalities_name, municipalities_population, region_id } =
+      req.body;
 
-async function updateMunicipality(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  const { id } = req.params;
-  const { municipalities_name, municipalities_population, region_id } =
-    req.body;
-
-  if (typeof municipalities_name !== "string") {
-    res.status(400).json({ error: "Invalid name" });
-  }
-  if (!region_id) {
-    res
-      .status(400)
-      .json({ error: "Du behöver ange vilken region kommunen tillhör." });
-  }
-
-  try {
-    const response = await service.updateMunicipality(
-      municipalities_name,
-      Number(municipalities_population),
-      Number(region_id),
-      Number(id),
-    );
-    if (!response) {
-      return next(new HttpError(404, "Kommun not found"));
-    }
-
-    res.status(200).json(response);
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      (error.name === "DrizzleQueryError" ||
-        (error as any).code === "23503" ||
-        /foreign key/i.test(error.message))
-    ) {
-      return next(
-        new HttpError(
-          409,
-          "Kan inte uppdatera kommunen: det finns ett problem med den angivna regionen.",
-        ),
+    try {
+      const response = await postMunicipality(
+        municipalities_name,
+        Number(municipalities_population),
+        Number(region_id),
       );
+      res.status(201).json(response);
+    } catch (error) {
+      next(error);
     }
-    next(error);
-  }
+  };
 }
+
+const postMunicipality = createPostMunicipalityHandler(
+  service.postMunicipality,
+);
+
+function createUpdateMunicipalityHandler(
+  updateMunicipality: typeof service.updateMunicipality,
+) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { municipalities_name, municipalities_population, region_id } =
+      req.body;
+
+    try {
+      const response = await updateMunicipality(
+        municipalities_name,
+        Number(municipalities_population),
+        Number(region_id),
+        Number(id),
+      );
+      if (!response || response.length < 1) {
+        return next(new HttpError(404, "Kunde inte hitta kommunen"));
+      }
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+const updateMunicipality = createUpdateMunicipalityHandler(
+  service.updateMunicipality,
+);
 
 function createDeleteMunicipalityHandler(
   deleteMunicipality: typeof service.deleteMunicipality,
@@ -165,7 +144,9 @@ export {
   getOneMunicipality,
   sumOfMunicipalities,
   getCitiesFromMunicipality,
+  createPostMunicipalityHandler,
   postMunicipality,
+  createUpdateMunicipalityHandler,
   updateMunicipality,
   createDeleteMunicipalityHandler,
   deleteMunicipality,

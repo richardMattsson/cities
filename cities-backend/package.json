@@ -16,7 +16,8 @@
     "build": "tsc --outDir dist",
     "dev": "tsx watch src/index.ts",
     "start:e2e": "tsx --env-file=../.env.e2e src/index.ts",
-    "test": "node --import tsx --test"
+    "test": "node --import tsx --test",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
