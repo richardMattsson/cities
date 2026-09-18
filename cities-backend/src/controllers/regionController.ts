@@ -47,59 +47,45 @@ async function getMunicipalitiesFromRegion(
   }
 }
 
-async function postRegion(req: Request, res: Response, next: NextFunction) {
-  const { regions_name, regions_population } = req.body;
-  if (typeof regions_name !== "string" || regions_name.trim() === "") {
-    return res.status(400).json({ error: "Invalid name" });
-  }
-  if (
-    regions_population !== undefined &&
-    Number.isNaN(Number(regions_population))
-  ) {
-    return res.status(400).json({ error: "Invalid population" });
-  }
-  try {
-    const region = await service.postRegion(
-      regions_name.trim(),
-      Number(regions_population),
-    );
-    res.status(201).json(region);
-  } catch (error) {
-    next(error);
-  }
-}
-
-async function updateRegion(req: Request, res: Response, next: NextFunction) {
-  const { id } = req.params;
-  const { regions_name, regions_population } = req.body;
-
-  try {
-    const response = await service.updateRegion(
-      regions_name,
-      Number(regions_population),
-      Number(id),
-    );
-    if (!response) {
-      return next(new HttpError(404, "Region not found"));
-    }
-    res.status(200).json(response);
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      (error.name === "DrizzleQueryError" ||
-        (error as any).code === "23503" ||
-        /foreign key/i.test(error.message))
-    ) {
-      return next(
-        new HttpError(
-          409,
-          "Kan inte ta bort regionen: det finns en eller flera städer som refererar till den.",
-        ),
+const createPostRegionHandler = (postRegion: typeof service.postRegion) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { regions_name, regions_population } = req.body;
+    try {
+      const region = await postRegion(
+        regions_name.trim(),
+        Number(regions_population),
       );
+      res.status(201).json(region);
+    } catch (error) {
+      next(error);
     }
-    next(error);
-  }
+  };
+};
+
+const postRegion = createPostRegionHandler(service.postRegion);
+
+function createUpdateRegionHandler(updateRegion: typeof service.updateRegion) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { regions_name, regions_population } = req.body;
+
+    try {
+      const response = await updateRegion(
+        regions_name,
+        Number(regions_population),
+        Number(id),
+      );
+      if (!response || response.length < 1) {
+        return next(new HttpError(404, "Kunde inte hitta regionen"));
+      }
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
+
+const updateRegion = createUpdateRegionHandler(service.updateRegion);
 
 async function deleteRegion(req: Request, res: Response, next: NextFunction) {
   const { id } = req.params;
@@ -129,7 +115,9 @@ export {
   getOneRegionAPI,
   sumOfRegions,
   getMunicipalitiesFromRegion,
+  createPostRegionHandler,
   postRegion,
+  createUpdateRegionHandler,
   updateRegion,
   deleteRegion,
 };

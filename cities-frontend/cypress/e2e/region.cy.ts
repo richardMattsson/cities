@@ -47,7 +47,7 @@ describe("region", () => {
     cy.get('[data-cy="list-item"]').contains(name).should("be.visible");
   });
 
-  it("should allow an authenticated user to update a city", () => {
+  it("should allow an authenticated user to update a region", () => {
     const originalName = regionName("update-original");
     const updatedName = regionName("update-complete");
     createRegionThroughUi(originalName, "12345").then((regionId) => {
