@@ -348,18 +348,31 @@ function RegionDetailView({ id }: { id: number }) {
   }, [id]);
 
   async function deleteRegion() {
-    try {
-      const deleted = await deleteItem(Number(id), deleteRegionAPI);
+    const token = await getAuth().currentUser?.getIdToken();
 
-      if (deleted) {
-        setSuccesMsg("Du har tagit bort en region");
+    if (!token) {
+      return setErrorMsg("Du måste vara inloggad för att ta bort en region.");
+    }
+
+    const proceed = confirm("Vill du verkligen ta bort?");
+
+    if (!proceed) {
+      return;
+    }
+
+    setErrorMsg("");
+    setSuccesMsg("");
+    try {
+      const response = await deleteRegionAPI(id, token);
+      const result = await response.json();
+
+      if (!response.ok) {
+        return setErrorMsg(result.error);
       }
-    } catch (error) {
-      if (error instanceof Error && error.message === "NOT_AUTHENTICATED") {
-        setErrorMsg("Du måste vara inloggad för att ta bort en region.");
-      } else {
-        setErrorMsg("Något gick fel.");
-      }
+
+      setSuccesMsg("Du har tagit bort en region");
+    } catch {
+      setErrorMsg("Något gick fel.");
     }
   }
 
@@ -383,7 +396,7 @@ function RegionDetailView({ id }: { id: number }) {
         }
       />
 
-      {errorMsg && <p>{errorMsg}</p>}
+      {errorMsg && <p data-cy="error-msg-region">{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
 
       <DetailButtonSection

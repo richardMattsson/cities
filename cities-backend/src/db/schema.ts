@@ -11,7 +11,7 @@ export const municipalities = pgTable("municipalities", {
   municipalities_name: text().notNull().unique(),
   municipalities_population: integer(),
   region_id: integer().references(() => regions.regions_id, {
-    onDelete: "cascade",
+    onDelete: "restrict",
     onUpdate: "cascade",
   }),
 });
