@@ -298,25 +298,36 @@ function MunicipalityDetailView({ id }: { id: number }) {
 function RegionDetailView({ id }: { id: number }) {
   const [region, setRegion] = useState<Region>();
   const [municipalities, setMunicipalities] = useState<Municipality[]>();
+  const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
 
   useEffect(() => {
     let mounted = true;
     (async () => {
+      setErrorMsg("");
+      setLoading(true);
+      setRegion(undefined);
       try {
         const response = await getOneRegionAPI(Number(id));
+
         if (!response.ok) {
-          console.log("error fetching resource");
+          if (!mounted) return;
+          const result = await response.json();
+          setErrorMsg(result.error);
+          setLoading(false);
           return;
         }
         const result = await response.json();
-
         if (!mounted) return;
 
         startTransition(() => setRegion(result[0]));
+        setLoading(false);
       } catch {
-        if (mounted) return;
+        if (!mounted) return;
+        setRegion(undefined);
+        setErrorMsg("Något gick fel med att hämta regionen");
+        setLoading(false);
       }
     })();
     return () => {
@@ -371,6 +382,7 @@ function RegionDetailView({ id }: { id: number }) {
       }
 
       setSuccesMsg("Du har tagit bort en region");
+      setRegion(undefined);
     } catch {
       setErrorMsg("Något gick fel.");
     }
@@ -378,31 +390,35 @@ function RegionDetailView({ id }: { id: number }) {
 
   return (
     <article className="detail-article">
-      <DetailInfoSection
-        title="Region"
-        name={region && region.regions_name}
-        population={region && String(region.regions_population)}
-        label="Kommuner"
-        children={
-          municipalities &&
-          municipalities.map((municipality) => (
-            <Link
-              key={municipality.municipalities_id}
-              to={`/detail/municipality/${municipality.municipalities_id}`}
-            >
-              <li>{municipality.municipalities_name}</li>
-            </Link>
-          ))
-        }
-      />
-
-      {errorMsg && <p data-cy="error-msg-region">{errorMsg}</p>}
+      {loading && <p data-cy="region-detail-loading">Laddar...</p>}
+      {errorMsg && <p data-cy="region-detail-error">{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
+      {region && (
+        <>
+          <DetailInfoSection
+            title="Region"
+            name={region && region.regions_name}
+            population={region && String(region.regions_population)}
+            label="Kommuner"
+            children={
+              municipalities &&
+              municipalities.map((municipality) => (
+                <Link
+                  key={municipality.municipalities_id}
+                  to={`/detail/municipality/${municipality.municipalities_id}`}
+                >
+                  <li>{municipality.municipalities_name}</li>
+                </Link>
+              ))
+            }
+          />
 
-      <DetailButtonSection
-        to={`/form/region/update/${id}`}
-        onClick={deleteRegion}
-      />
+          <DetailButtonSection
+            to={`/form/region/update/${id}`}
+            onClick={deleteRegion}
+          />
+        </>
+      )}
     </article>
   );
 }

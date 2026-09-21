@@ -150,11 +150,16 @@ describe("region", () => {
         expect(request.headers.authorization).to.match(/^Bearer .+/);
         expect(response?.body[0].regions_id).to.eq(regionId);
       });
-      createdRegionId = undefined;
       cy.contains("Du har tagit bort en region").should("be.visible");
-      cy.request(`/api/regions/${regionId}`)
-        .its("body")
-        .should("deep.equal", []);
+
+      cy.request({
+        method: "GET",
+        url: `/api/regions/${regionId}`,
+        failOnStatusCode: false,
+      })
+        .its("status")
+        .should("eq", 404);
+
       cy.visit("/#/regions");
       cy.contains('[data-cy="list-item"]', name).should("not.exist");
     });
@@ -181,7 +186,7 @@ describe("region", () => {
             expect(response?.statusCode).to.eq(409);
           });
 
-          cy.get('[data-cy="error-msg-region"]').should(
+          cy.get('[data-cy="region-detail-error"]').should(
             "have.text",
             "Du kan inte ta bort regionen eftersom den har kommuner.",
           );
@@ -197,5 +202,25 @@ describe("region", () => {
         },
       );
     });
+  });
+
+  it("should send 404 when requested id is missing", () => {
+    const missingRegionId = 1000000;
+    cy.intercept("GET", `/api/regions/${missingRegionId}`).as("getRegion");
+
+    cy.visit(`/#/detail/region/${missingRegionId}`);
+
+    cy.wait("@getRegion").then(({ response }) => {
+      expect(response?.statusCode).to.eq(404);
+      expect(response?.body).to.contain({ error: "Kunde inte hitta regionen" });
+    });
+
+    cy.get('[data-cy="region-detail-error"]').should(
+      "have.text",
+      "Kunde inte hitta regionen",
+    );
+
+    cy.get('[data-cy="edit-item"]').should("not.exist");
+    cy.get('[data-cy="delete-item"]').should("not.exist");
   });
 });

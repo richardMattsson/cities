@@ -11,19 +11,26 @@ async function getRegions(_req: Request, res: Response, next: NextFunction) {
     next(error);
   }
 }
-async function getOneRegionAPI(
-  req: Request,
-  res: Response,
-  next: NextFunction,
+
+function createGetOneRegionHandler(
+  getOneRegionAPI: typeof service.getOneRegionAPI,
 ) {
-  const { id } = req.params;
-  try {
-    const region = await service.getOneRegionAPI(Number(id));
-    res.json(region);
-  } catch (error) {
-    next(error);
-  }
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+      const region = await getOneRegionAPI(Number(id));
+
+      if (region.length < 1) {
+        return next(new HttpError(404, "Kunde inte hitta regionen"));
+      }
+      res.json(region);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
+
+const getOneRegionAPI = createGetOneRegionHandler(service.getOneRegionAPI);
 
 async function sumOfRegions(_req: Request, res: Response, next: NextFunction) {
   try {
@@ -34,19 +41,23 @@ async function sumOfRegions(_req: Request, res: Response, next: NextFunction) {
   }
 }
 
-async function getMunicipalitiesFromRegion(
-  req: Request,
-  res: Response,
-  next: NextFunction,
+function createGetMunicipalitiesFromRegionHandler(
+  getMunicipalitiesFromRegion: typeof service.getMunicipalitiesFromRegion,
 ) {
-  const { id } = req.params;
-  try {
-    const response = await service.getMunicipalitiesFromRegion(Number(id));
-    res.json(response);
-  } catch (error) {
-    next(error);
-  }
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+      const response = await getMunicipalitiesFromRegion(Number(id));
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
+
+const getMunicipalitiesFromRegion = createGetMunicipalitiesFromRegionHandler(
+  service.getMunicipalitiesFromRegion,
+);
 
 const createPostRegionHandler = (postRegion: typeof service.postRegion) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -92,8 +103,13 @@ function createDeleteRegionHandler(deleteRegion: typeof service.deleteRegion) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     try {
-      const result = await deleteRegion(Number(id));
-      res.status(200).json(result);
+      const response = await deleteRegion(Number(id));
+
+      if (!response || response.length < 1) {
+        return next(new HttpError(404, "Kunde inte hitta regionen"));
+      }
+
+      res.status(200).json(response);
     } catch (error) {
       if (isForeignKeyConstraintError(error)) {
         return next(
@@ -112,8 +128,10 @@ const deleteRegion = createDeleteRegionHandler(service.deleteRegion);
 
 export {
   getRegions,
+  createGetOneRegionHandler,
   getOneRegionAPI,
   sumOfRegions,
+  createGetMunicipalitiesFromRegionHandler,
   getMunicipalitiesFromRegion,
   createPostRegionHandler,
   postRegion,

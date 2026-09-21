@@ -15,3 +15,7 @@ export const updateRegionValidation = [
   ...regionParamValidation,
   ...regionBodyValidation,
 ];
+
+export const deleteRegionValidation = [...regionParamValidation];
+export const getOneRegionValidation = [...regionParamValidation];
+export const getMunicipalitiesFromRegionValidation = [...regionParamValidation];
