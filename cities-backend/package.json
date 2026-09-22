@@ -17,7 +17,7 @@
     "dev": "tsx watch src/index.ts",
     "start:e2e": "tsx --env-file=../.env.e2e src/index.ts",
     "test": "node --import tsx --test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && echo Backend type check passed"
   },
   "keywords": [],
   "author": "",

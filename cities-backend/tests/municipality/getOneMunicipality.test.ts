@@ -1,63 +1,25 @@
 import { describe, it } from "node:test";
-import { createDeleteMunicipalityHandler } from "../../src/controllers/municipalityController";
-import { deleteMunicipalityValidation } from "../../src/validation/municipalityValidation";
+import { createGetOneMunicipalityHandler } from "../../src/controllers/municipalityController";
+import { getOneMunicipalityValidation } from "../../src/validation/municipalityValidation";
 import { createResponse } from "../helpers/createResponse";
-import { DrizzleQueryError } from "drizzle-orm";
 import { HttpError } from "../../src/errors/HttpError";
-import { errorHandler } from "../../src/middleware/errorHandler";
 import assert from "node:assert";
 import { validate } from "../../src/middleware/validateInputMiddleware";
 
-describe("DELETE municipality test", () => {
-  it("should show error 409 and message foreign key constraint", async () => {
-    const cause = Object.assign(new Error("foreign key violation"), {
-      code: "23001",
-    });
-
-    const databaseError = new DrizzleQueryError("fake query", [], cause);
-
-    const fakeDeleteMunicipality = async () => {
-      throw databaseError;
-    };
-
-    const handler = createDeleteMunicipalityHandler(fakeDeleteMunicipality);
-    const { response, getBody, getStatus } = createResponse();
-
-    let nextError: unknown;
-    const next = (error: unknown) => {
-      nextError = error;
-    };
-
-    await handler({ params: { id: "3" } } as any, response, next);
-
-    assert.ok(nextError instanceof HttpError);
-    assert.equal(nextError.status, 409);
-    assert.equal(
-      nextError.message,
-      "Du kan inte ta bort kommunen eftersom den har städer.",
-    );
-
-    errorHandler(nextError, {} as any, response, () => {});
-
-    assert.equal(getStatus(), 409);
-    assert.deepEqual(getBody(), {
-      error: "Du kan inte ta bort kommunen eftersom den har städer.",
-    });
-  });
-
+describe("GET one municipality test", () => {
   const invalidIds = ["not-a-number", "0", "-1"];
 
   for (const invalidId of invalidIds) {
     it(`rejects invalid id "${invalidId}"`, async () => {
       let serviceCallCount = 0;
 
-      async function fakeDeleteMunicipality() {
+      async function fakeGetOneMunicipality() {
         serviceCallCount++;
         return [];
       }
 
-      const handler = createDeleteMunicipalityHandler(fakeDeleteMunicipality);
-      const middleware = validate(deleteMunicipalityValidation);
+      const handler = createGetOneMunicipalityHandler(fakeGetOneMunicipality);
+      const middleware = validate(getOneMunicipalityValidation);
       const { response, getStatus, getBody, wasStatusCalled, wasJsonCalled } =
         createResponse();
 
@@ -91,13 +53,13 @@ describe("DELETE municipality test", () => {
     } as any;
 
     let serviceCalled = false;
-    const fakeDeleteMunicipality = async () => {
+    const fakeGetOneMunicipality = async () => {
       serviceCalled = true;
       return [];
     };
 
-    const middleware = validate(deleteMunicipalityValidation);
-    const handler = createDeleteMunicipalityHandler(fakeDeleteMunicipality);
+    const middleware = validate(getOneMunicipalityValidation);
+    const handler = createGetOneMunicipalityHandler(fakeGetOneMunicipality);
 
     let validateNext = false;
     await middleware(req, response, () => {
@@ -109,8 +71,8 @@ describe("DELETE municipality test", () => {
       nextError = handlerError;
     });
 
-    assert.equal(serviceCalled, true);
     assert.equal(validateNext, true);
+    assert.equal(serviceCalled, true);
     assert.ok(nextError instanceof HttpError);
     assert.equal((nextError as HttpError).status, 404);
     assert.deepEqual(

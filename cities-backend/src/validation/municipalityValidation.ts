@@ -16,3 +16,9 @@ export const updateMunicipalityValidation = [
   ...municipalityParamValidation,
   ...municipalityBodyValidation,
 ];
+
+export const deleteMunicipalityValidation = [...municipalityParamValidation];
+export const getOneMunicipalityValidation = [...municipalityParamValidation];
+export const getCitiesFromMunicipalityValidation = [
+  ...municipalityParamValidation,
+];

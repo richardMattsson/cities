@@ -16,19 +16,27 @@ async function getMunicipalities(
   }
 }
 
-async function getOneMunicipality(
-  req: Request,
-  res: Response,
-  next: NextFunction,
+function createGetOneMunicipalityHandler(
+  getOneMunicipality: typeof service.getOneMunicipality,
 ) {
-  const { id } = req.params;
-  try {
-    const response = await service.getOneMunicipality(Number(id));
-    res.json(response);
-  } catch (error) {
-    next(error);
-  }
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+      const response = await getOneMunicipality(Number(id));
+
+      if (!response || response.length < 1) {
+        return next(new HttpError(404, "Kunde inte hitta kommunen"));
+      }
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
+
+const getOneMunicipality = createGetOneMunicipalityHandler(
+  service.getOneMunicipality,
+);
 
 async function sumOfMunicipalities(
   _req: Request,
@@ -43,19 +51,23 @@ async function sumOfMunicipalities(
   }
 }
 
-async function getCitiesFromMunicipality(
-  req: Request,
-  res: Response,
-  next: NextFunction,
+function createGetCitiesFromMunicipalityHandler(
+  getCitiesFromMunicipality: typeof service.getCitiesFromMunicipality,
 ) {
-  const { id } = req.params;
-  try {
-    const response = await service.getCitiesFromMunicipality(Number(id));
-    res.json(response);
-  } catch (error) {
-    next(error);
-  }
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    try {
+      const response = await getCitiesFromMunicipality(Number(id));
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
+
+const getCitiesFromMunicipality = createGetCitiesFromMunicipalityHandler(
+  service.getCitiesFromMunicipality,
+);
 
 function createPostMunicipalityHandler(
   postMunicipality: typeof service.postMunicipality,
@@ -119,6 +131,10 @@ function createDeleteMunicipalityHandler(
     try {
       const result = await deleteMunicipality(Number(id));
 
+      if (!result || result.length < 1) {
+        return next(new HttpError(404, "Kunde inte hitta kommunen"));
+      }
+
       res.status(200).json(result);
     } catch (error) {
       if (isForeignKeyConstraintError(error)) {
@@ -141,8 +157,10 @@ const deleteMunicipality = createDeleteMunicipalityHandler(
 
 export {
   getMunicipalities,
+  createGetOneMunicipalityHandler,
   getOneMunicipality,
   sumOfMunicipalities,
+  createGetCitiesFromMunicipalityHandler,
   getCitiesFromMunicipality,
   createPostMunicipalityHandler,
   postMunicipality,

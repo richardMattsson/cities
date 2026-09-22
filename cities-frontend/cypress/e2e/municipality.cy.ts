@@ -169,11 +169,16 @@ describe("municipality", () => {
         expect(request.headers.authorization).to.match(/^Bearer .+/);
         expect(response?.body[0].municipalities_id).to.eq(municipalityId);
       });
-      createdMunicipalityId = undefined;
       cy.contains("Du har tagit bort en kommun").should("be.visible");
-      cy.request(`/api/municipalities/${municipalityId}`)
-        .its("body")
-        .should("deep.equal", []);
+
+      cy.request({
+        method: "GET",
+        url: `/api/municipalities/${municipalityId}`,
+        failOnStatusCode: false,
+      })
+        .its("status")
+        .should("eq", 404);
+
       cy.visit("/#/municipalities");
       cy.contains('[data-cy="list-item"]', name).should("not.exist");
     });
@@ -205,7 +210,7 @@ describe("municipality", () => {
               expect(response?.statusCode).to.eq(409);
             });
 
-            cy.get('[data-cy="error-msg-municipality"]').should(
+            cy.get('[data-cy="municipality-detail-error"]').should(
               "have.text",
               "Du kan inte ta bort kommunen eftersom den har städer.",
             );
@@ -220,5 +225,27 @@ describe("municipality", () => {
         );
       },
     );
+  });
+
+  it("should send 404 when requested id is missing", () => {
+    const missingMunicipalityId = 1000000;
+    cy.intercept("GET", `/api/municipalities/${missingMunicipalityId}`).as(
+      "getMunicipality",
+    );
+
+    cy.visit(`/#/detail/municipality/${missingMunicipalityId}`);
+
+    cy.wait("@getMunicipality").then(({ response }) => {
+      expect(response?.statusCode).to.eq(404);
+      expect(response?.body).to.contain({ error: "Kunde inte hitta kommunen" });
+    });
+
+    cy.get('[data-cy="municipality-detail-error"]').should(
+      "have.text",
+      "Kunde inte hitta kommunen",
+    );
+
+    cy.get('[data-cy="edit-item"]').should("not.exist");
+    cy.get('[data-cy="delete-item"]').should("not.exist");
   });
 });

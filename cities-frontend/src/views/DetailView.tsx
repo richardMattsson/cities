@@ -153,37 +153,43 @@ function CityDetailView({ id }: { id: number }) {
 }
 
 function MunicipalityDetailView({ id }: { id: number }) {
-  const [municipality, setMunicipality] = useState<Municipality>({
-    municipalities_id: 0,
-    municipalities_name: "",
-    municipalities_population: "",
-    region_id: 0,
-  });
+  const [municipality, setMunicipality] = useState<Municipality>();
   const [cities, setCities] = useState<City[]>();
   const [regions, setRegions] = useState<Region[]>();
+  const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [succesMsg, setSuccesMsg] = useState("");
   const region = regions?.find(
-    (region) => region.regions_id === municipality.region_id,
+    (region) => region.regions_id === municipality?.region_id,
   );
 
   useEffect(() => {
     let mounted = true;
 
     (async () => {
+      setLoading(true);
+      setErrorMsg("");
+      setMunicipality(undefined);
       try {
         const response = await getOneMunicipalityAPI(Number(id));
+        const result = await response.json();
+
         if (!response.ok) {
-          console.log("error fetching resource");
+          if (!mounted) return;
+
+          setErrorMsg(result.error);
+          setLoading(false);
           return;
         }
-        const result = await response.json();
 
         if (!mounted) return;
 
         startTransition(() => setMunicipality(result[0]));
+        setLoading(false);
       } catch {
-        if (mounted) return;
+        if (!mounted) return;
+        setErrorMsg("Något gick fel med att hämta kommunen");
+        setLoading(false);
       }
     })();
     return () => {
@@ -270,27 +276,35 @@ function MunicipalityDetailView({ id }: { id: number }) {
 
   return (
     <article className="detail-article">
-      <DetailInfoSection
-        title="Kommun"
-        name={municipality && municipality.municipalities_name}
-        population={municipality && municipality.municipalities_population}
-        label="Städer"
-        children={
-          cities &&
-          cities.map((city) => (
-            <Link key={city.cities_id} to={`/detail/city/${city.cities_id}`}>
-              <li>{city.cities_name}</li>
-            </Link>
-          ))
-        }
-        region={region}
-      />
-      {errorMsg && <p data-cy="error-msg-municipality">{errorMsg}</p>}
+      {loading && <p data-cy="municipality-detail-loading">Laddar...</p>}
+      {errorMsg && <p data-cy="municipality-detail-error">{errorMsg}</p>}
       {succesMsg && <p>{succesMsg}</p>}
-      <DetailButtonSection
-        to={`/form/municipality/update/${id}`}
-        onClick={deleteMunicipality}
-      />
+      {municipality && (
+        <>
+          <DetailInfoSection
+            title="Kommun"
+            name={municipality && municipality.municipalities_name}
+            population={municipality && municipality.municipalities_population}
+            label="Städer"
+            children={
+              cities &&
+              cities.map((city) => (
+                <Link
+                  key={city.cities_id}
+                  to={`/detail/city/${city.cities_id}`}
+                >
+                  <li>{city.cities_name}</li>
+                </Link>
+              ))
+            }
+            region={region}
+          />
+          <DetailButtonSection
+            to={`/form/municipality/update/${id}`}
+            onClick={deleteMunicipality}
+          />
+        </>
+      )}
     </article>
   );
 }
