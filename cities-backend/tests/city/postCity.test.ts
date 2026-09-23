@@ -1,10 +1,10 @@
 import { describe, it } from "node:test";
 import { validationResult } from "express-validator";
 import assert from "node:assert";
-import { validate } from "../src/middleware/validateInputMiddleware";
-import { addCityValidation } from "../src/validation/cityValidation";
-import { createResponse } from "./helpers/createResponse";
-import { createPostCityHandler } from "../src/controllers/citiesController";
+import { validate } from "../../src/middleware/validateInputMiddleware";
+import { addCityValidation } from "../../src/validation/cityValidation";
+import { createResponse } from "../helpers/createResponse";
+import { createPostCityHandler } from "../../src/controllers/citiesController";
 import { DrizzleQueryError } from "drizzle-orm";
 
 describe("Test for invalid city input", () => {

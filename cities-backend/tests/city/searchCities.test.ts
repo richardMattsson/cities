@@ -1,9 +1,9 @@
 import { describe, it } from "node:test";
-import { cityQueryValidation } from "../src/validation/cityValidation";
+import { cityQueryValidation } from "../../src/validation/cityValidation";
 import assert from "node:assert";
-import { createResponse } from "./helpers/createResponse";
-import { validate } from "../src/middleware/validateInputMiddleware";
-import { createSearchCityHandler } from "../src/controllers/citiesController";
+import { createResponse } from "../helpers/createResponse";
+import { validate } from "../../src/middleware/validateInputMiddleware";
+import { createSearchCityHandler } from "../../src/controllers/citiesController";
 
 describe("Search query validation and controller/service behavior", () => {
   it("verify no-match search is trimmed and returns 200 []", async () => {

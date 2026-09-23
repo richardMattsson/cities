@@ -1,10 +1,10 @@
 import { describe, it } from "node:test";
-import * as controller from "../src/controllers/citiesController";
+import * as controller from "../../src/controllers/citiesController";
 import assert from "node:assert";
-import { HttpError } from "../src/errors/HttpError";
-import { updateCityValidation } from "../src/validation/cityValidation";
-import { validate } from "../src/middleware/validateInputMiddleware";
-import { createResponse } from "./helpers/createResponse";
+import { HttpError } from "../../src/errors/HttpError";
+import { updateCityValidation } from "../../src/validation/cityValidation";
+import { validate } from "../../src/middleware/validateInputMiddleware";
+import { createResponse } from "../helpers/createResponse";
 import { DrizzleQueryError } from "drizzle-orm";
 
 describe("Detect invalid city request", () => {

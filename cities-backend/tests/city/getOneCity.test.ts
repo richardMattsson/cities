@@ -1,10 +1,10 @@
 import { describe, it } from "node:test";
-import { createGetOneCityHandler } from "../src/controllers/citiesController";
-import { HttpError } from "../src/errors/HttpError";
+import { createGetOneCityHandler } from "../../src/controllers/citiesController";
+import { HttpError } from "../../src/errors/HttpError";
 import assert from "node:assert";
-import { validate } from "../src/middleware/validateInputMiddleware";
-import { getOneCityValidation } from "../src/validation/cityValidation";
-import { createResponse } from "./helpers/createResponse";
+import { validate } from "../../src/middleware/validateInputMiddleware";
+import { getOneCityValidation } from "../../src/validation/cityValidation";
+import { createResponse } from "../helpers/createResponse";
 
 describe("Testing get request of one city", () => {
   it("returns error 404 when a city does not exist", async () => {
