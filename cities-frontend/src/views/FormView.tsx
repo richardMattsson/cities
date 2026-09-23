@@ -321,6 +321,8 @@ function MunicipalityFormView() {
     id: number,
   ) {
     e.preventDefault();
+    setErrorMsg("");
+    setSuccesMsg("");
 
     const body: Omit<Municipality, "municipalities_id"> = {
       municipalities_name: municipality.municipalities_name,
@@ -403,7 +405,7 @@ function MunicipalityFormView() {
           }
         />
         {loading && loading}
-        {errorMsg && <p>{errorMsg}</p>}
+        {errorMsg && <p data-cy="municipality-form-error">{errorMsg}</p>}
         {succesMsg && <p>{succesMsg}</p>}
         <input
           type="submit"
@@ -474,7 +476,8 @@ function RegionFormView() {
       setLoading("");
 
       if (!response.ok) {
-        console.log("error fetching resource");
+        const result = await response.json();
+        setErrorMsg(result.error);
         return;
       }
 
@@ -491,6 +494,8 @@ function RegionFormView() {
     id: number,
   ) {
     e.preventDefault();
+    setErrorMsg("");
+    setSuccesMsg("");
 
     const body = {
       regions_name: region.regions_name,
@@ -506,18 +511,20 @@ function RegionFormView() {
         setErrorMsg("Du måste vara inloggad för att skapa en region.");
         return;
       }
+
       const response = await regionApi.updateRegionAPI(body, id, token);
 
       setLoading("");
       if (!response.ok) {
-        console.log("error fetching resource");
+        const result = await response.json();
+        setErrorMsg(result.error);
+        return;
       }
 
       setSuccesMsg("Du har uppdaterat en region");
-    } catch (error) {
+    } catch {
       setLoading("");
       setErrorMsg("Något gick fel.");
-      console.log(error);
     }
   }
   return (
@@ -544,7 +551,7 @@ function RegionFormView() {
           setValue={(e) => setRegion({ ...region, regions_population: e })}
         />
         {loading && loading}
-        {errorMsg && <p>{errorMsg}</p>}
+        {errorMsg && <p data-cy="region-form-error">{errorMsg}</p>}
         {succesMsg && <p>{succesMsg}</p>}
         <input
           type="submit"

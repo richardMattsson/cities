@@ -1,10 +1,10 @@
 import { describe, it } from "node:test";
-import { createDeleteCityHandler } from "../src/controllers/citiesController";
+import { createDeleteCityHandler } from "../../src/controllers/citiesController";
 import assert from "node:assert";
-import { HttpError } from "../src/errors/HttpError";
-import { validate } from "../src/middleware/validateInputMiddleware";
-import { deleteCityValidation } from "../src/validation/cityValidation";
-import { createResponse } from "./helpers/createResponse";
+import { HttpError } from "../../src/errors/HttpError";
+import { validate } from "../../src/middleware/validateInputMiddleware";
+import { deleteCityValidation } from "../../src/validation/cityValidation";
+import { createResponse } from "../helpers/createResponse";
 
 describe("Delete a city that does'nt exist", () => {
   it("handle request on a city that returns an empty array", async () => {

@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import * as service from "../services/regionService.ts";
 import { HttpError } from "../errors/HttpError.ts";
 import { isForeignKeyConstraintError } from "../errors/isForeignKeyConstraintError.ts";
+import { isUniqueConstraintError } from "../errors/isUniqueConstraintError.ts";
 
 async function getRegions(_req: Request, res: Response, next: NextFunction) {
   try {
@@ -69,6 +70,11 @@ const createPostRegionHandler = (postRegion: typeof service.postRegion) => {
       );
       res.status(201).json(region);
     } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        return next(
+          new HttpError(409, "Det finns redan en region med det namnet."),
+        );
+      }
       next(error);
     }
   };
@@ -92,6 +98,11 @@ function createUpdateRegionHandler(updateRegion: typeof service.updateRegion) {
       }
       res.status(200).json(response);
     } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        return next(
+          new HttpError(409, "Det finns redan en region med det namnet."),
+        );
+      }
       next(error);
     }
   };

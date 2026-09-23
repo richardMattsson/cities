@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import * as service from "../services/municipalityService.ts";
 import { HttpError } from "../errors/HttpError.ts";
 import { isForeignKeyConstraintError } from "../errors/isForeignKeyConstraintError.ts";
+import { isUniqueConstraintError } from "../errors/isUniqueConstraintError.ts";
 
 async function getMunicipalities(
   _req: Request,
@@ -84,6 +85,11 @@ function createPostMunicipalityHandler(
       );
       res.status(201).json(response);
     } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        return next(
+          new HttpError(409, "Det finns redan en kommun med det namnet."),
+        );
+      }
       next(error);
     }
   };
@@ -114,6 +120,11 @@ function createUpdateMunicipalityHandler(
 
       res.status(200).json(response);
     } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        return next(
+          new HttpError(409, "Det finns redan en kommun med det namnet."),
+        );
+      }
       next(error);
     }
   };

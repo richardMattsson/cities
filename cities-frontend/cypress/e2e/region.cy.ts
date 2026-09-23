@@ -223,4 +223,31 @@ describe("region", () => {
     cy.get('[data-cy="edit-item"]').should("not.exist");
     cy.get('[data-cy="delete-item"]').should("not.exist");
   });
+
+  it("should not be able to create a new region with a duplicate name", () => {
+    const region = regionName("uniqueConstraint");
+
+    createRegionThroughUi(region, "123");
+
+    cy.intercept("POST", "/api/regions").as("createRegion");
+    cy.intercept("GET", "/api/regions").as("getRegions");
+
+    cy.visit("/#/form/region/add");
+    cy.get('[data-cy="input-region"]').clear().type(region);
+    cy.get('[data-cy="input-befolkning"]').clear().type("123");
+    cy.get('[data-cy="submit-form"]').click();
+
+    cy.wait("@createRegion").then(({ response }) => {
+      expect(response?.statusCode).to.eq(409);
+    });
+
+    cy.get('[data-cy="region-form-error"]').should(
+      "have.text",
+      "Det finns redan en region med det namnet.",
+    );
+
+    cy.visit("/#/regions");
+    cy.wait("@getRegions").its("response.statusCode").should("eq", 200);
+    cy.get('[data-cy="list-item"]').contains(region).should("be.visible");
+  });
 });

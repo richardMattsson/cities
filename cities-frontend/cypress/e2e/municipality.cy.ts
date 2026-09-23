@@ -248,4 +248,31 @@ describe("municipality", () => {
     cy.get('[data-cy="edit-item"]').should("not.exist");
     cy.get('[data-cy="delete-item"]').should("not.exist");
   });
+
+  it("should not be able to create a new municipality with a duplicate name", () => {
+    const municipality = municipalityName("uniqueConstraint");
+
+    createMunicipalityThroughUi(municipality, "123");
+
+    cy.intercept("POST", "/api/municipalities").as("createMunicipality");
+    cy.intercept("GET", "/api/municipalities").as("getMunicipalities");
+
+    cy.visit("/#/form/municipality/add");
+    cy.get('[data-cy="input-kommun"]').clear().type(municipality);
+    cy.get('[data-cy="input-befolkning"]').clear().type("123");
+    cy.get('[data-cy="submit-form"]').click();
+
+    cy.wait("@createMunicipality").then(({ response }) => {
+      expect(response?.statusCode).to.eq(409);
+    });
+
+    cy.get('[data-cy="municipality-form-error"]').should(
+      "have.text",
+      "Det finns redan en kommun med det namnet.",
+    );
+
+    cy.visit("/#/municipalities");
+    cy.wait("@getMunicipalities").its("response.statusCode").should("eq", 200);
+    cy.get('[data-cy="list-item"]').contains(municipality).should("be.visible");
+  });
 });

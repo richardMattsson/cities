@@ -5,6 +5,8 @@ import { postRegionValidation } from "../../src/validation/regionValidation";
 import { createResponse } from "../helpers/createResponse";
 import { createPostRegionHandler } from "../../src/controllers/regionController";
 import { validationResult } from "express-validator";
+import { HttpError } from "../../src/errors/HttpError";
+import { DrizzleQueryError } from "drizzle-orm";
 
 describe("POST region test", () => {
   it("send 400 on invalid input", async () => {
@@ -93,5 +95,36 @@ describe("POST region test", () => {
     });
 
     assert.strictEqual(nextError, databaseError);
+  });
+
+  it("Send 409 on POST region with duplicate name", async () => {
+    const cause = Object.assign(new Error("not-unique-name"), { code: 23505 });
+
+    const databaseError = new DrizzleQueryError("not-unique-name", [], cause);
+
+    const fakePostRegion = async () => {
+      throw databaseError;
+    };
+
+    const handler = createPostRegionHandler(fakePostRegion);
+
+    const req = {
+      body: { regions_name: "Blekinge", regions_population: 123 },
+    } as any;
+    const { response, wasStatusCalled, wasJsonCalled } = createResponse();
+
+    let nextError: unknown;
+    await handler(req, response, (error) => {
+      nextError = error;
+    });
+
+    assert.ok(nextError instanceof HttpError);
+    assert.equal(nextError.status, 409);
+    assert.equal(
+      nextError.message,
+      "Det finns redan en region med det namnet.",
+    );
+    assert.equal(wasStatusCalled(), false);
+    assert.equal(wasJsonCalled(), false);
   });
 });
