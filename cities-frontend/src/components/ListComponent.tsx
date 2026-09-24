@@ -15,7 +15,7 @@ function ListComponent({ cities, municipalities, regions }: ItemsListProps) {
       {cities &&
         cities.map((city) => (
           <CustomLink
-            id={city.cities_id}
+            key={city.cities_id}
             to={`/detail/city/${city.cities_id}`}
             itemName={city.cities_name}
           />
@@ -24,7 +24,7 @@ function ListComponent({ cities, municipalities, regions }: ItemsListProps) {
       {municipalities &&
         municipalities.map((municipality) => (
           <CustomLink
-            id={municipality.municipalities_id}
+            key={municipality.municipalities_id}
             to={`/detail/municipality/${municipality.municipalities_id}`}
             itemName={municipality.municipalities_name}
           />
@@ -33,7 +33,7 @@ function ListComponent({ cities, municipalities, regions }: ItemsListProps) {
       {regions &&
         regions.map((region) => (
           <CustomLink
-            id={region.regions_id}
+            key={region.regions_id}
             to={`/detail/region/${region.regions_id}`}
             itemName={region.regions_name}
           />
@@ -43,14 +43,13 @@ function ListComponent({ cities, municipalities, regions }: ItemsListProps) {
 }
 
 type CustomLinkProps = {
-  id: number;
   to: string;
   itemName: string;
 };
 
-function CustomLink({ id, to, itemName }: CustomLinkProps) {
+function CustomLink({ to, itemName }: CustomLinkProps) {
   return (
-    <Link key={id} to={to}>
+    <Link to={to}>
       <li data-cy="list-item">{truncateText(itemName, 20)}</li>
     </Link>
   );
